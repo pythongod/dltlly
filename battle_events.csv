@@ -1,18 +1,14 @@
-Name #1,Name #2,Event,Type,Date (Year),League
+Name #1,Name #2,Event,Type,Year,League
 Ssynic,Craze,B-Day #10,Rap Battle,Unknown,DLTLLY
 Yarambo,JollyJay,B-Day #10,Rap Battle,Unknown,DLTLLY
 Kato,Bong Teggy,B-Day #10,Rap Battle,Unknown,DLTLLY
 Karanova,Mc Geuner,B-Day #10,Rap Battle,Unknown,DLTLLY
 Mighty P,Karma,B-Day #10,Rap Battle,Unknown,DLTLLY
 Lyrico,Tobi High,splash! 25,On Beat,Unknown,DLTLLY
-Lyrico,Tobi High,splash! 25,On Beat,Unknown,DLTLLY
 Pablo,Mordrake,splash! 25,On Beat,Unknown,DLTLLY
-Cris Kotzen & Escape,Vyrus & Freezy,2on2  splash! 25,On Beat,Unknown,DLTLLY
 Cris Kotzen & Escape,Vyrus & Freezy,2on2  splash! 25,On Beat,Unknown,DLTLLY
 Kid Soldier,Krom,splash! 25,On Beat,Unknown,DLTLLY
 N'antinein,Bahamakarma,splash! 25,On Beat,Unknown,DLTLLY
-N'antinein,Bahamakarma,splash! 25,On Beat,Unknown,DLTLLY
-Shizu,Mave,splash! 25,Rap Battle,Unknown,DLTLLY
 Shizu,Mave,splash! 25,Rap Battle,Unknown,DLTLLY
 Wolff,Requiem,München,Rap Battle,Unknown,DLTLLY
 Mc Geuner,Snakeheadrhyme,München,Rap Battle,Unknown,DLTLLY
@@ -21,19 +17,37 @@ Joseph Steinschleuder,Shizu,München,Rap Battle,Unknown,DLTLLY
 T-Way,Julo,München,Rap Battle,Unknown,DLTLLY
 Kato,Meidi,MAYhem #6,Rap Battle,Unknown,DLTLLY
 Craze,Karanova,MAYhem #6,Rap Battle,Unknown,DLTLLY
+Karkobi,Hiding John,MAYhem #6,Rap Battle,Unknown,DLTLLY
+Kid Soldier,Hansen,MAYhem #6,Rap Battle,Unknown,DLTLLY
 Zeuge,Joseph Steinschleuder,MAYhem #6,Rap Battle,Unknown,DLTLLY
 Mavgic,Bong Teggy,🏆  Titlematch 🏆,On Beat,Unknown,DLTLLY
 Tokz,Tisos,Match,On Beat,Unknown,DLTLLY
-Tokz,Tisos,Match,On Beat,Unknown,DLTLLY
 Rolling G,Jeystone,Proving GroundsBerlin,Rap Battle,Unknown,DLTLLY
 MC Janosch,Quasi Infamous,Proving GroundsBerlin,Rap Battle,Unknown,DLTLLY
+Mars,ZinZity,NRWeekend 6,Rap Battle,Unknown,DLTLLY
 Bronko Banano,Young Kennedy,Proving GroundsBerlin,Rap Battle,Unknown,DLTLLY
+Mc Geuner,DeeLah,NRWeekend 6,Rap Battle,Unknown,DLTLLY
+Swear Boss,Chaarlz,Bars von Chaarlz,On Beat,Unknown,DLTLLY
+Jack Dragon,Duff,NRWeekend 6,Rap Battle,Unknown,DLTLLY
+Yarambo,Craze,NRWeekend 6,Rap Battle,Unknown,DLTLLY
+Celune,Wenzel Washington,Proving GroundsBerlin,Rap Battle,Unknown,DLTLLY
+Joseph Steinschleuder,Requiem,NRWeekend 6,Rap Battle,Unknown,DLTLLY
 Valik,Davis,Proving GroundsBerlin,Rap Battle,Unknown,DLTLLY
+Neilz,Tobi High,NRWeekend 6,Rap Battle,Unknown,DLTLLY
+Maka,Zeptah,NRWeekend 6,Rap Battle,Unknown,DLTLLY
 Mordrake,Faivel,Proving GroundsWiesbaden,Rap Battle,Unknown,DLTLLY
 Holu & Freekno,Joseph Steinschleuder & Triple Beat,2on2,Rap Battle,Unknown,DLTLLY
 Gerro,Bilal,Kassel,Rap Battle,Unknown,DLTLLY
+Neilz,Wolff,DISSember 6,Rap Battle,Unknown,DLTLLY
+Julo,Kid Soldier,DISSember 6,Rap Battle,Unknown,DLTLLY
+Kato,Robscure,🏆 TITLE MATCH 🏆,Rap Battle,Unknown,DLTLLY
+Hiding John,MC Geuner,DISSember 6,Rap Battle,Unknown,DLTLLY
+Karanova,BanDan,DISSember 6,On Beat,Unknown,DLTLLY
 Mars B.,JollyJay,Kassel,Rap Battle,Unknown,DLTLLY
+T-Way,Neilz,Kassel,Rap Battle,Unknown,DLTLLY
 Duff,B-Dad,Kassel,Rap Battle,Unknown,DLTLLY
+Shizu,Niza,Kassel,Rap Battle,Unknown,DLTLLY
+Pulsar,Shaolum,Kassel,Rap Battle,Unknown,DLTLLY
 Papi Schlauch,Craze,Stellwerk Hamburg,Rap Battle,Unknown,DLTLLY
 Joseph Steinschleuder,Hiding John,Stellwerk Hamburg,Rap Battle,Unknown,DLTLLY
 Mazzikaner,Requiem,Proving Grounds Panke Berlin,Rap Battle,Unknown,DLTLLY
@@ -43,7 +57,6 @@ Krom,Craze,Splash! Festival,On Beat,Unknown,DLTLLY
 Bong Teggy,Davie Jones,Splash! Festival,On Beat,Unknown,DLTLLY
 T-Way,Tobi High,Splash! Festival,On Beat,Unknown,DLTLLY
 Mars B.,Neilz,Backstage München,Rap Battle,Unknown,DLTLLY
-Phasenkind,Vyrus,Battle,On Beat,Unknown,DLTLLY
 Phasenkind,Vyrus,Battle,On Beat,Unknown,DLTLLY
 Shizu,Tao,Backstage München,Rap Battle,Unknown,DLTLLY
 MIKESH,SSYNIC,MAYhem #5,Rap Battle,Unknown,DLTLLY
@@ -56,7 +69,6 @@ Khacoby,DeeLah,NRWeekend 5,Rap Battle,Unknown,DLTLLY
 Maka,Heinz87,NRWeekend 5,Rap Battle,Unknown,DLTLLY
 Joseph Steinschleuder,Steel,Düsseldorf,On Beat,Unknown,DLTLLY
 Niza,Devasberg,NRWeekend 5,Rap Battle,Unknown,DLTLLY
-Dizzepticon,Koozy,NRWeekend 5,On Beat,Unknown,DLTLLY
 Dizzepticon,Koozy,NRWeekend 5,On Beat,Unknown,DLTLLY
 Julo,Gerro,NRWeekend 5,Rap Battle,Unknown,DLTLLY
 Notyzze,Pablo,München,On Beat,Unknown,DLTLLY
@@ -82,9 +94,6 @@ Kid Soldier,Hiding John,Panke,Rap Battle,2020,DLTLLY
 Falk,Karanova,Virtual  Battle,On Beat,Unknown,DLTLLY
 Phasenkind,Peat,Virtual  Battle,On Beat,Unknown,DLTLLY
 Kato,Mr. Whyte,Fussball Battle,Rap Battle,2020,Unknown
-Zoom Freestyle: Papi Schlauch,Master Marv,,Rap Battle,Unknown,DLTLLY
-Khacoby,Notyzze,Corona Battle Package,Rap Battle,Unknown,Unknown
-Mars B.,BX,Corona Battle Package,Rap Battle,Unknown,Unknown
 Craze,Burst,English 1 Rounder,Rap Battle,Unknown,Unknown
 Falk,Ano-nym,OnlineBattle,Rap Battle,Unknown,DLTLLY
 Zeptah,Gammel,OnlineBattle,Rap Battle,Unknown,DLTLLY
@@ -129,6 +138,7 @@ Phasenkind,PrettyShittyJiggy,Ludwigshafen,Rap Battle,2019,DLTLLY
 MC Maik,Fate,Frankfurt,Rap Battle,2019,DLTLLY
 "DLTLLY+D&DL ""Breakthrough"" Steel",Hiding John,Halbfinale Frankfurt,Rap Battle,2019,DLTLLY
 Joe Pharo,Ryko-J,Frankfurt,Rap Battle,2019,DLTLLY
+Yarambo,Mikesh,🏆 TITLE-MATCH 🏆,Rap Battle,Unknown,DLTLLY
 Brian Damage,Merlin,B.Day#6,Rap Battle,2019,DLTLLY
 Cris Kotzen,Robscure,B.Day#6,Rap Battle,2019,DLTLLY
 Henrey,Craze,B.Day#6,Rap Battle,2019,DLTLLY
@@ -146,6 +156,7 @@ Silence,K.O. Ray,HIPinside Berlin,Rap Battle,2019,DLTLLY
 Kato,Rino Mandingo,Splash22,On Beat,2019,DLTLLY
 Yarambo,Cris Kotzen,Hamburg,Rap Battle,2019,DLTLLY
 Ano-nym,Joe Pharo,Hamburg,On Beat,2019,DLTLLY
+Mars B.,Tobi High,Hamburg,Rap Battle,Unknown,DLTLLY
 Nikiz,Fabiga,Hamburg,On Beat,2019,DLTLLY
 Merlin,Khacoby,Hamburg,Rap Battle,2019,DLTLLY
 Aris,Julo,Hamburg,Rap Battle,2019,DLTLLY
@@ -153,6 +164,7 @@ Joseph Steinschleuder,Falk,Hamburg,Rap Battle,2019,DLTLLY
 Cashus K + Mac Horn,MC Geuner + Natif,Hamburg,Rap Battle,2019,DLTLLY
 DXXDSTXCK,TableddnTimmy,Hamburg,Rap Battle,2019,DLTLLY
 RenetiXX,Shizu,Hamburg,Rap Battle,2019,DLTLLY
+Bong Teggy,Mikesh,MAYhem #4,Rap Battle,Unknown,DLTLLY
 JerMC,Robscure,MAYhem4,Rap Battle,2019,DLTLLY
 Sizyphos,Davie Jones,MAYhem4,Rap Battle,2019,DLTLLY
 Fate,Craze,MAYhem4,Rap Battle,2019,DLTLLY
@@ -182,6 +194,10 @@ Kid Soldier,Karma,Kassel,Rap Battle,2019,DLTLLY
 Lug Serious,Audienzz,CoEvent4,Rap Battle,2019,DLTLLY
 Django,Craze,CoEvent4,Rap Battle,2019,DLTLLY
 SnakeHeadRhyme,Shizu,CoEvent4,Rap Battle,2019,DLTLLY
+Robscure,Mikesh,DISSember #3,Rap Battle,Unknown,DLTLLY
+Onkel Oktomusch + Die Zwetschke,Cris Kotzen + Ano-nym,DISSember #3,Rap Battle,Unknown,DLTLLY
+Yarambo,Nedal Nib,🏆 TITLE-MATCH 🏆,Rap Battle,Unknown,DLTLLY
+Brian Damage,Wolff,DISSember #3,Rap Battle,Unknown,DLTLLY
 JollyJay,Buddi,Dortmund,Rap Battle,2018,DLTLLY
 Akanoo,MC Geuner,Dortmund,Rap Battle,2018,DLTLLY
 Craze,Lug Serious,Dortmund,Rap Battle,2018,DLTLLY
@@ -194,12 +210,14 @@ Henker,Highdemann,Dortmund,Rap Battle,2018,DLTLLY
 Lyrico,Henrey,Dortmund,Rap Battle,2018,DLTLLY
 Olio,Indoor Stan,Leipzig,On Beat,2018,DLTLLY
 A-Ron,Chinooka,Dortmund,Rap Battle,2018,DLTLLY
+Cris Kotzen,Mighty Mo,München BDAY # 5,Rap Battle,Unknown,DLTLLY
 SnakeHeadRhyme,RenetiXX,Leipzig,Rap Battle,2018,DLTLLY
 Leonidas,Zeuge,Dortmund,Rap Battle,2018,DLTLLY
 Yarambo,Bong Teggy,B.Day#5,Rap Battle,2018,DLTLLY
 Pilz,Davie Jones,B.Day#5,Rap Battle,2018,DLTLLY
 Kid Soldier,DXXDSTXCK,Leipzig,Rap Battle,2018,DLTLLY
 Ano-nym,Pueblo Escobar,Leipzig,On Beat,2018,DLTLLY
+Mikesh,Papi Schlauch,BDay #5,Rap Battle,Unknown,DLTLLY
 Plural,T-Jey,Leipzig,Rap Battle,2018,DLTLLY
 Robscure,Vyrus,B.Day#5,Rap Battle,2018,DLTLLY
 Mave,Kato,Freestyle- HipHopKemp,Rap Battle,2018,DLTLLY
@@ -232,11 +250,13 @@ Merlin,BX,Stuttgart,Rap Battle,2018,DLTLLY
 Pueblo Escobar + Morizz Fizzl,Schalle + Alcantara,Stuttgart,On Beat,2018,DLTLLY
 Mikesh,Akanoo,Stuttgart,Rap Battle,2018,DLTLLY
 Bdad,Nikiz,Stuttgart,On Beat,2018,DLTLLY
+Vyrus,Mavgic,NRWeekend #2,On Beat,Unknown,DLTLLY
 Fabelouis,Farmer,Stuttgart,Rap Battle,2018,DLTLLY
 Proton,Robscure,NRWeekend2,Rap Battle,2018,DLTLLY
 Change,Tommy2Late,Stuttgart,On Beat,2018,DLTLLY
 Kato,Mave,NRWeekend2,Rap Battle,2018,DLTLLY
 Buddi,VT,NRWeekend2,On Beat,2018,DLTLLY
+Yarambo,Davie Jones,NRWeekend #2,Rap Battle,Unknown,DLTLLY
 Tuncmann,Wandelbarz,NRWeekend2,Rap Battle,2018,DLTLLY
 Wolff,NichtDeinTyp,NextGeneration VR 4/4 Stuttgart,Rap Battle,2018,DLTLLY
 Karanova,OE,NRWeekend2,Rap Battle,2018,DLTLLY
@@ -260,17 +280,27 @@ Karma,Mars B.,DISSember2,Rap Battle,2017,DLTLLY
 T-Way,VT,DISSember2,Rap Battle,2017,DLTLLY
 Jack Dragon,Hansen,DISSember2,Rap Battle,2017,DLTLLY
 Cris Kotzen,Schote,Leipzig,On Beat,2017,DLTLLY
+Sport-Rap-Battle #5 ShaoLum,Joe-L (Sport-Bars)| DLTLLY,s,Rap Battle,Unknown,DLTLLY
 Louis Beton,Hörsturz,Leipzig,Rap Battle,2017,DLTLLY
 Wandelbarz,Mikesh,Leipzig,Rap Battle,2017,DLTLLY
 Sizyphos,Ilhan,Leipzig,Rap Battle,2017,DLTLLY
 FU!,Terra Pete,Leipzig,On Beat,2017,DLTLLY
 MC Maik,Akanoo,Leipzig,Rap Battle,2017,DLTLLY
+Sport-Rap-Battle #4 Jotti (Schalke 04),Mave (Chemnitzer FC):,,Rap Battle,Unknown,DLTLLY
 Papi Schlauch,JerMC,Wien,Rap Battle,2017,DLTLLY
+Sport-Rap-Battle #3 Bong Teggy (Fußball),Lyrico (Eishockey):,,Rap Battle,Unknown,DLTLLY
 DemoLux,Krom,Wien,Rap Battle,2017,DLTLLY
 Sirius Crack,Fate1,Wien,Rap Battle,2017,DLTLLY
 Proton,Tobi Nice,s B.Day#4,On Beat,2017,DLTLLY
 Lyrico,Nedal Nib,2nd TITLE-MATCH B.Day#4,Rap Battle,2017,DLTLLY
+Sport-Rap-Battle #1: Borussia Dortmund,FC Bayern München,,Rap Battle,Unknown,DLTLLY
 Spike,Akanoo,s Wien,Rap Battle,2017,DLTLLY
+Unanymous,JollyJay,B.Day#4,Rap Battle,2017,DLTLLY
+Merlin,Yarambo,B.Day#4,Rap Battle,2017,DLTLLY
+Vyrus,Tommy2Late,s B.Day#4,On Beat,2017,DLTLLY
+BX,Ilhan,B.Day #4,Rap Battle,2017,DLTLLY
+Gregpipe,Davie Jones,FFM,Rap Battle,Unknown,DLTLLY
+Saking,Akanoo,FFM,Rap Battle,2017,DLTLLY
 EkHead,CPE,FFM,Rap Battle,2017,DLTLLY
 VT,Karma,FFM,Rap Battle,2017,DLTLLY
 Clep,Bong Teggy,Splash 20,Rap Battle,2017,DLTLLY
@@ -283,6 +313,7 @@ Davie Jones,Schote,Hamburg,On Beat,2017,DLTLLY
 Nedal Nib,JerMc,Mayhem2,Rap Battle,2017,DLTLLY
 Nikiz,Stockinger,Mayhem2,Rap Battle,2017,DLTLLY
 Mikesh,Tuncmann,Hamburg,Rap Battle,2017,DLTLLY
+Doktor Dave,Jack Dragon - REMATCH!,,Rap Battle,2017,DLTLLY
 Henrey,Vyrus,Hamburg,Rap Battle,2017,DLTLLY
 Lyrico,Robscure,TitleContenderMatch Mayhem2,Rap Battle,2017,DLTLLY
 N'antinein,Cris Kotzen,Mayhem2,Rap Battle,2017,DLTLLY
@@ -291,6 +322,7 @@ T-Way,Merlin,München,Rap Battle,2017,DLTLLY
 Schote,Jack Dragon,München,Rap Battle,2017,DLTLLY
 Karma,BDad,München,Rap Battle,2017,DLTLLY
 Change19,Schalle,München,Rap Battle,2017,DLTLLY
+Onkel Oktomusch & Die Zwetschke,Falk & Khacoby,NRWeekend,Rap Battle,Unknown,DLTLLY
 Wolle Der Grobe,Balavababa,NewcomerBattle München,Rap Battle,2017,DLTLLY
 Mars B.,Yarambo,NRWeekend,Rap Battle,2017,DLTLLY
 DuFF,Doktor Dave,NRWeekend,Rap Battle,2017,DLTLLY
@@ -298,6 +330,7 @@ VT,Vyrus,NRWeekend,Rap Battle,2017,DLTLLY
 Tobi Nice,Notyzze,NRWeekend,Rap Battle,2017,DLTLLY
 Barracuda,Mavgic,NRWeekend,Rap Battle,2017,DLTLLY
 Fabiga,Four Seven,NRWeekend,Rap Battle,2017,DLTLLY
+Pilz,Nedal Nib,Tapefabrik,Rap Battle,Unknown,DLTLLY
 Henrey,N'antinein,Tapefabrik,Rap Battle,2017,DLTLLY
 Robscure,Merlin,Berlin,Rap Battle,2017,DLTLLY
 Tommy2Late,Hörsturz,Berlin,Rap Battle,2017,DLTLLY
@@ -311,6 +344,7 @@ VT,ShaoLum,Kassel,Rap Battle,2017,DLTLLY
 Crocodile Andi,Teach,Kassel,Rap Battle,2017,DLTLLY
 Davie Jones,Clepto,Leipzig,Rap Battle,2016,DLTLLY
 Paperbite,D-OS,NewcomerBattle Kassel,Rap Battle,2017,DLTLLY
+Nedal Nib,Brian Damage,🏆 TITLE-MATCH 🏆,Rap Battle,Unknown,DLTLLY
 Doktor Dave,Mave,Leipzig,Rap Battle,2016,DLTLLY
 Papi Schlauch,Lyrico,Dissember,Rap Battle,2016,DLTLLY
 Louis Beton,Sizyphos,Leipzig,Rap Battle,2016,DLTLLY
@@ -324,6 +358,7 @@ Akanoo,Mr. Whyte,3x in die Fresse,Rap Battle,2016,DLTLLY
 Change19,BX,Stuttgart,Rap Battle,2016,DLTLLY
 Gixtah,Street,NewcomerBattle 3x in die Fresse,Rap Battle,2016,DLTLLY
 Barracuda,Schalle,Stuttgart,Rap Battle,2016,DLTLLY
+Lyrico,Gregpipe,BDay #3,Rap Battle,Unknown,DLTLLY
 Nicht Dein Typ,Tommy2Late,Stuttgart,Rap Battle,2016,DLTLLY
 Vyrus,Four Seven,Stuttgart,Rap Battle,2016,DLTLLY
 Dawson,Solay,NewcomerBattle Day 2/2,Rap Battle,2016,DLTLLY
@@ -345,6 +380,7 @@ Davie Jones,Doktor Dave,The Base,Rap Battle,2016,DLTLLY
 N'antinein,Besser,The Base,Rap Battle,2016,DLTLLY
 Atzenkalle,Main Moe,Splash19,Rap Battle,2016,DLTLLY
 Tobi Nice & Duff,Yarambo & Indoor Stan,Splash19,Rap Battle,2016,DLTLLY
+Gregpipe + Mars B.,Bong Teggy + Brian Damage,SPLASH #19,Rap Battle,Unknown,DLTLLY
 Schote & BDad,Buddi & Fabiga,Splash19,Rap Battle,2016,DLTLLY
 Cris Kotzen,Fab,Fete de la HipHop,Rap Battle,2016,DLTLLY
 Robscure,Davie Jones,Wien,Rap Battle,2016,DLTLLY
@@ -352,6 +388,7 @@ Seby Tone,Karma,Wien,Rap Battle,2016,DLTLLY
 Battleboi Basti,Doktor Dave,MAYhem,Rap Battle,2016,DLTLLY
 Lyrico,Hansen,MAYhem,Rap Battle,2016,DLTLLY
 Jack Dragon,JerMc,Wien,Rap Battle,2016,DLTLLY
+Bong Teggy & Papi Schlauch,Onkel Oktomusch & Die Zwetschke,MAYhem,Rap Battle,Unknown,DLTLLY
 FellowSoph,Ekhead,Wien,Rap Battle,2016,DLTLLY
 Barbee n' Flow,Spello & Al Pone,Wien,Rap Battle,2016,DLTLLY
 Mave & MC Maik,Tobi Nice & Duff,MAYhem,Rap Battle,2016,DLTLLY
@@ -371,6 +408,7 @@ Wandelbarz,Cris Kotzen,Dortmund,Rap Battle,2016,DLTLLY
 Zeptah,Neit,Dortmund,Rap Battle,2016,DLTLLY
 Robscure,BX,Kassel,Rap Battle,2016,DLTLLY
 Falk & Khacoby,Ekhead & CPE,Düsseldorf,Rap Battle,2016,DLTLLY
+Nedal Nib,Bong Teggy,Berlin,Rap Battle,Unknown,DLTLLY
 Bauda,Henrey,Düsseldorf,Rap Battle,2016,DLTLLY
 Harlem T,MC Intifada,FreestyleBattle Dortmund,Rap Battle,2016,DLTLLY
 Indoor Stan,Robscure,Berlin,Rap Battle,2016,DLTLLY
@@ -395,6 +433,8 @@ Collapz & CPE,Aresst & D.ZUM.A,NewcomerBattle Bochum,Rap Battle,2015,DLTLLY
 Fabiga,Bauda,Bochum,Rap Battle,2015,DLTLLY
 Jack Dragon,Smoke Tüü,Stuttgart,Rap Battle,2015,DLTLLY
 Dezzad,N'Antinein,Stuttgart,Rap Battle,2015,DLTLLY
+Bong Teggy,Brian Damage,Bad Bars,Rap Battle,Unknown,DLTLLY
+Battleboi Basti & Dee Ho,Onkel Oktomusch & Die Zwetschke,BDAY #3,Rap Battle,Unknown,DLTLLY
 Nedal Nib,Mars B.,B.day #2,Rap Battle,2015,DLTLLY
 Ali Affront,Seby Tone,B.Day#2,Rap Battle,2015,DLTLLY
 Change19 & Henrey,Tobi High & Max Stoned,B.Day#2,Rap Battle,2015,DLTLLY
@@ -410,8 +450,9 @@ Lyrico,Mars B.,Tapefabrik,Rap Battle,2015,DLTLLY
 Karma,Limstar,NewcomerBattle München,Rap Battle,2015,DLTLLY
 Henrey,Change19,NewcomerBattle München,Rap Battle,2015,DLTLLY
 Le Nerd,Davie Jones,Berlin,Rap Battle,2015,DLTLLY
-JOLLYJAY,MR TONGUE TWISTER,,Rap Battle,Unknown,Dont Flop
+Lyrico,Der Fischer,Berlin,Rap Battle,2015,DLTLLY
 Mighty Mo & Nedal Nib,Duff,Splash 18,Rap Battle,2015,DLTLLY
+Gregpipe + Basic,Battleboi Basti + Besser,Berlin,Rap Battle,Unknown,DLTLLY
 Mars B.,Mirror,Berlin,Rap Battle,2015,DLTLLY
 Tis L,T-Way,Berlin,Rap Battle,2015,DLTLLY
 MC Maik + Mave,Scumgod + DirtySanchez,Berlin,Rap Battle,2015,DLTLLY
@@ -447,13 +488,10 @@ Der Fischer,Harry Crotch,Stuttgart,Rap Battle,2014,DLTLLY
 BX,Crash Bundy,Stuttgart,Rap Battle,2014,DLTLLY
 Peter Pogen,Mars B.,s Stuttgart,Rap Battle,2014,DLTLLY
 BDad,Smoke Tüü,Stuttgart,Rap Battle,2014,DLTLLY
-JEAN GOUGH FRAIS,OGMIOS,Don't Flop,Rap Battle,Unknown,Don't Flop
-IMPACT,MANIAC,Don't Flop,Rap Battle,Unknown,Don't Flop
 Jack Dragon,Suza,Don't Flop CoEvent,Rap Battle,2014,DLTLLY
-INNUENDO,JOLLYJAY,Don't Flop,Rap Battle,Unknown,Don't Flop
 Nikiz,Luie-Die-Nadel,s Don't Flop CoEvent,Rap Battle,2014,DLTLLY
-MR TONGUE TWISTER,BRIAN DAMAGE,Don't Flop,Rap Battle,Unknown,Don't Flop
 Fatcap,Doktor Dave,Don't Flop CoEvent,Rap Battle,2014,DLTLLY
+Happy Beckmann & 4tune,Petschino & Juskah,Splash #17,Rap Battle,Unknown,DLTLLY
 Merlin,Gozpel,Splash 17,Rap Battle,2014,DLTLLY
 Mighty P,MC Maik,EOW-Tour,Rap Battle,2014,DLTLLY
 DuFF,Fresh Polakke,Splash 17,Rap Battle,2014,DLTLLY
@@ -463,10 +501,12 @@ Pille,MisterOneTake,EOW-Tour,Rap Battle,2014,DLTLLY
 BDad,TWO,EOW-Tour,Rap Battle,2014,DLTLLY
 Proton,Koozy,EOW-Tour,Rap Battle,2014,DLTLLY
 Onkel Oktomusch & Die Zwetschke,DeeLah & MOH,EOW-Tour,Rap Battle,2014,DLTLLY
+Buddi,Veedel Kaztro,EOW-Tour,Rap Battle,2014,DLTLLY
 Mirko Fon,Kiddom,EOW-Tour,Rap Battle,2014,DLTLLY
 Mighty Mo,Hansen,EOW-Tour,Rap Battle,2014,DLTLLY
 Salo,Tanguy,München,Rap Battle,2014,DLTLLY
 Seby Tone,Manny Blanco,München,Rap Battle,2014,DLTLLY
+Merlin,Trump,München,Rap Battle,2014,DLTLLY
 Jack Dragon,Davie Jones,München,Rap Battle,2014,DLTLLY
 Johnny Rakete,Philipp Quh,München,Rap Battle,2014,DLTLLY
 Nestor,Pirate,Berlin,Rap Battle,2014,DLTLLY
@@ -475,6 +515,7 @@ Micky Worthless,Jean-Gough Frais,international,Rap Battle,2014,DLTLLY
 George Midas,Der Fischer,Berlin,Rap Battle,2014,DLTLLY
 Brian Damage & Harry Crotch,Proton & Roni 87,Berlin,Rap Battle,2014,DLTLLY
 Amah,Koozy,München,Rap Battle,2014,DLTLLY
+LeeWun,Trump,München,Rap Battle,2014,DLTLLY
 Harry Crotch,Jack Dragon,München,Rap Battle,2014,DLTLLY
 Merlin,Mighty P,München,Rap Battle,2014,DLTLLY
 Johnny Rakete,Duff,München,Rap Battle,2014,DLTLLY
