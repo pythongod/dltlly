@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     //fetch('data.csv')
-    fetch('battle_events1702107178.049786.csv')
+    fetch('battle_events.csv')
         .then(response => response.text())
         .then(text => {
             const data = parseCSV(text);
