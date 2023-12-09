@@ -12,19 +12,29 @@ document.addEventListener('DOMContentLoaded', function() {
         tableBody.innerHTML = '';
         data.forEach((row, index) => {
             if (index === 0) return; // Skip header row
-            const tr = document.createElement('tr');
-            row.forEach(cell => {
-                const td = document.createElement('td');
-                if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
-                    td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-                } else {
-                    td.textContent = cell;
-                }
-                tr.appendChild(td);
-            });
-            tableBody.appendChild(tr);
+                // Create data rows
+                const tr = document.createElement('tr');
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
+                        td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+                    } else {
+                        td.textContent = cell;
+                    }
+    
+                    // Check if the cell is for the League column
+                    if (cellIndex === 5) { // Assuming league is in the 6th column (index 5)
+                        const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`; // Name #1, Name #2, Event, League
+                        const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+                        td.innerHTML = `<a href="${youtubeUrl}" target="_blank">${cell}</a>`;
+                    }
+    
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
         });
     }
+    
     
 
     function searchTable(data) {
