@@ -1,12 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
+    let csvData = []; // Declare csvData to store the CSV data
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     const searchBox = document.getElementById('searchBox');
-
-    searchBox.addEventListener('input', () => searchTable(data));
 
     function parseCSV(text) {
         return text.split('\n').map(row => row.split(','));
     }
+
+    document.getElementById('sort-uploaded').addEventListener('click', () => {
+        const sortedData = sortDataByUploaded(csvData); // Use csvData
+        populateTable([csvData[0], ...sortedData]); // Re-populate the table with sorted data
+    });
 
     function populateTable(data, searchText = '') {
         tableBody.innerHTML = '';
@@ -35,6 +39,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    function sortDataByUploaded(data) {
+        // Assuming the 'Uploaded' column is the last one
+        return data.slice(1).sort((a, b) => {
+            // Extract dates from the 'Uploaded' column (last column in each row)
+            const datePattern = /(\d{4}-\d{1,2}-\d{1,2})/;
+            const dateStringA = (a[a.length - 1].match(datePattern) || [])[1];
+            const dateStringB = (b[b.length - 1].match(datePattern) || [])[1];
+    
+            // Parse the dates
+            const dateA = dateStringA ? new Date(dateStringA) : new Date(0); // Fallback to epoch date if invalid
+            const dateB = dateStringB ? new Date(dateStringB) : new Date(0); // Fallback to epoch date if invalid
+    
+            // Compare the dates
+            return dateB - dateA;
+        });
+    }
     
 
     function searchTable(data) {
@@ -50,26 +70,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
         populateTable(filteredData, searchBox.value); // Pass the current search text
     }
-    
-      
-    
 
     //fetch('data.csv')
     fetch('battle_events.csv')
     .then(response => response.text())
     .then(text => {
-        const data = parseCSV(text);
-        csvData = data; // Update the csvData variable with the loaded data
-        populateTable(data); // Populate the table with initial data
+        csvData = parseCSV(text); // Update csvData with the parsed data
+        populateTable(csvData); // Populate the table with initial data
 
         // Update the initial search results count
-        const initialCount = data.length - 1; // Subtract 1 for the header row
+        const initialCount = csvData.length - 1; // Use csvData for count
         document.getElementById('search-results').textContent = `Search results: ${initialCount}`;
     })
     .catch(error => console.error('Error fetching the CSV file:', error));
 
-    // Update the event listener to use csvData
-    searchBox.addEventListener('input', () => searchTable(csvData));
-
+    searchBox.addEventListener('input', () => searchTable(csvData)); // Corrected event listener
 });
 
