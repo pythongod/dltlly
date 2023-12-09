@@ -19,62 +19,68 @@ document.addEventListener('DOMContentLoaded', function() {
     
 
 
-    function populateTable(data, searchText = '') {
-        tableBody.innerHTML = '';
-        data.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-    
-            const tr = document.createElement('tr');
-            row.forEach((cell, cellIndex) => {
-                const td = document.createElement('td');
-    
-                // Format views
-                if (cellIndex === 7) { // Assuming 'Views' is the 8th column (index 7)
-                    td.textContent = parseInt(cell).toLocaleString();
-                } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
-                    td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-                } else {
-                    td.textContent = cell;
-                }
-    
-                    // Check if the cell is for the League column
-                    if (cellIndex === 5) { // Assuming league is in the 6th column (index 5)
-                        const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`; // Name #1, Name #2, Event, League
-                        const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
-                        td.innerHTML = `<a href="${youtubeUrl}" target="_blank">${cell}</a>`;
-                    }
-    
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-        });
-    }
-    
-    function sortDataByUploaded(data) {
-        // Assuming the 'Uploaded' column is the last one
-        return data.slice(1).sort((a, b) => {
-            // Extract dates from the 'Uploaded' column (last column in each row)
-            const datePattern = /(\d{4}-\d{1,2}-\d{1,2})/;
-            const dateStringA = (a[a.length - 1].match(datePattern) || [])[1];
-            const dateStringB = (b[b.length - 1].match(datePattern) || [])[1];
-    
-            // Parse the dates
-            const dateA = dateStringA ? new Date(dateStringA) : new Date(0); // Fallback to epoch date if invalid
-            const dateB = dateStringB ? new Date(dateStringB) : new Date(0); // Fallback to epoch date if invalid
-    
-            // Compare the dates
-            return dateB - dateA;
-        });
-    }
+function populateTable(data, searchText = '') {
+    tableBody.innerHTML = '';
+    data.forEach((row, index) => {
+        if (index === 0) return; // Skip header row
 
-    function sortDataByViews(data) {
-        // Assuming the 'Views' column is the 8th one
-        return data.slice(1).sort((a, b) => {
-            const viewsA = parseInt(a[7]);
-            const viewsB = parseInt(b[7]);
-            return viewsB - viewsA;
-        });
-    }
+        const tr = document.createElement('tr');
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement('td');
+
+            // Format views
+            if (cellIndex === 7) { // Assuming 'Views' is the 8th column (index 7)
+                td.textContent = parseInt(cell).toLocaleString();
+            } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
+                td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+            } else {
+                td.textContent = cell;
+            }
+
+                // Check if the cell is for the League column
+                if (cellIndex === 5) { // Assuming league is in the 6th column (index 5)
+                    const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`; // Name #1, Name #2, Event, League
+                    const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+                    td.innerHTML = `<a href="${youtubeUrl}" target="_blank">${cell}</a>`;
+                }
+
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+    });
+}
+    
+function sortDataByUploaded(data) {
+    // Assuming the 'Uploaded' column is now the 7th one (index 6)
+    return data.slice(1).sort((a, b) => {
+        // Check if the 'Uploaded' data exists in both rows
+        if (!a[6] || !b[6]) {
+            return !a[6] ? 1 : -1; // Sort rows with missing data to the end
+        }
+
+        // Extract dates from the 'Uploaded' column
+        const datePattern = /(\d{4}-\d{1,2}-\d{1,2})/;
+        const dateStringA = (a[6].match(datePattern) || [])[1];
+        const dateStringB = (b[6].match(datePattern) || [])[1];
+
+        // Parse the dates
+        const dateA = dateStringA ? new Date(dateStringA) : new Date(0); // Fallback to epoch date if invalid
+        const dateB = dateStringB ? new Date(dateStringB) : new Date(0); // Fallback to epoch date if invalid
+
+        // Compare the dates
+        return dateB - dateA;
+    });
+}
+
+
+function sortDataByViews(data) {
+    // Assuming the 'Views' column is the 8th one
+    return data.slice(1).sort((a, b) => {
+        const viewsA = parseInt(a[7]);
+        const viewsB = parseInt(b[7]);
+        return viewsB - viewsA;
+    });
+}
     
 
     function searchTable(data) {
