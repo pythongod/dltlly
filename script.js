@@ -12,19 +12,30 @@ document.addEventListener('DOMContentLoaded', function() {
         populateTable([csvData[0], ...sortedData]); // Re-populate the table with sorted data
     });
 
+    document.getElementById('sort-views').addEventListener('click', () => {
+        const sortedData = sortDataByViews(csvData); // Assuming csvData holds your table data
+        populateTable([csvData[0], ...sortedData]); // Re-populate the table with sorted data
+    });
+    
+
+
     function populateTable(data, searchText = '') {
         tableBody.innerHTML = '';
         data.forEach((row, index) => {
             if (index === 0) return; // Skip header row
-                // Create data rows
-                const tr = document.createElement('tr');
-                row.forEach((cell, cellIndex) => {
-                    const td = document.createElement('td');
-                    if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
-                        td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-                    } else {
-                        td.textContent = cell;
-                    }
+    
+            const tr = document.createElement('tr');
+            row.forEach((cell, cellIndex) => {
+                const td = document.createElement('td');
+    
+                // Format views
+                if (cellIndex === 7) { // Assuming 'Views' is the 8th column (index 7)
+                    td.textContent = parseInt(cell).toLocaleString();
+                } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
+                    td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+                } else {
+                    td.textContent = cell;
+                }
     
                     // Check if the cell is for the League column
                     if (cellIndex === 5) { // Assuming league is in the 6th column (index 5)
@@ -53,6 +64,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
             // Compare the dates
             return dateB - dateA;
+        });
+    }
+
+    function sortDataByViews(data) {
+        // Assuming the 'Views' column is the 8th one
+        return data.slice(1).sort((a, b) => {
+            const viewsA = parseInt(a[7]);
+            const viewsB = parseInt(b[7]);
+            return viewsB - viewsA;
         });
     }
     
