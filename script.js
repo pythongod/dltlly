@@ -81,6 +81,7 @@ function sortDataByViews(data) {
         return viewsB - viewsA;
     });
 }
+
     
 
     function searchTable(data) {
@@ -113,3 +114,22 @@ function sortDataByViews(data) {
     searchBox.addEventListener('input', () => searchTable(csvData)); // Corrected event listener
 });
 
+fetch('info.yaml')
+    .then(response => response.text())
+    .then(yamlText => {
+        const yamlData = jsyaml.load(yamlText);
+
+        // Use the last_updated_time directly
+        const lastUpdatedTime = yamlData.last_updated_time;
+
+        // Replace the hyphen in the time part with a colon for display
+        const formattedDateTime = lastUpdatedTime.replace(/(\d{4}-\d{2}-\d{2}) (\d{2})-(\d{2})/, '$1 $2:$3');
+
+        document.getElementById('last-updated').textContent += formattedDateTime;
+    })
+    .catch(error => console.error('Error fetching or parsing the YAML file:', error));
+
+
+
+
+    

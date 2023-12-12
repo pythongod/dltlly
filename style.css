@@ -13,13 +13,27 @@ input#searchBox {
     font-size: 16px;
 }
 
-#search-results {
-    margin-top: 5px; /* Adjust this value as needed */
-    margin-bottom: 20px; /* Consistent with the container's children */ 
-    text-align: right;
-    font-size: 14px; /* Smaller font size */
-    margin: 10px 0; /* Consistent vertical margin */
+.info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; /* Ensure the container spans the full width */
+}
+
+.info-text {
+    /* Remove the margin rule if it's causing layout issues */
+    font-size: 14px;
     color: #666;
+    margin: 5px 0;
+}
+
+/* If you still want to use text-align for the content inside the divs */
+#search-results {
+    text-align: left; /* Aligns text inside the div to the left */
+}
+
+#last-updated {
+    text-align: right; /* Aligns text inside the div to the right */
 }
 
 .highlight {
