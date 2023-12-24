@@ -52,13 +52,19 @@ function sortDataByUploaded(data) {
     });
 }
 
-function sortDataByViews(data) {
+function sortDataByViews(data, isAscending) {
     return data.slice(1).sort((a, b) => {
         const viewsA = parseInt(a[7]);
         const viewsB = parseInt(b[7]);
-        return viewsB - viewsA;
+
+        if (isAscending) {
+            return viewsA - viewsB; // For ascending order
+        } else {
+            return viewsB - viewsA; // For descending order
+        }
     });
 }
+
 
 function searchTable(data) {
     const searchText = document.getElementById('searchBox').value.toLowerCase();
@@ -81,7 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('sort-views').addEventListener('click', () => {
-        const sortedData = sortDataByViews(currentData);
+        const header = document.getElementById('sort-views');
+        const isAscending = header.classList.contains('asc');
+        
+        header.classList.toggle('asc', !isAscending);
+        header.classList.toggle('desc', isAscending);
+
+        const sortedData = sortDataByViews(currentData, isAscending);
         populateTable([currentData[0], ...sortedData]);
     });
 
