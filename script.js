@@ -1,35 +1,23 @@
-document.addEventListener('DOMContentLoaded', function() {
-    let csvData = []; // Declare csvData to store the CSV data
-    const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-    const searchBox = document.getElementById('searchBox');
+let csvData = []; // Declare csvData to store the CSV data
+let currentData = []; // Data currently displayed (filtered or full dataset)
 
-    function parseCSV(text) {
-        return text.split('\n').map(row => row.split(','));
-    }
 
-    document.getElementById('sort-uploaded').addEventListener('click', () => {
-        const sortedData = sortDataByUploaded(csvData); // Use csvData
-        populateTable([csvData[0], ...sortedData]); // Re-populate the table with sorted data
-    });
-
-    document.getElementById('sort-views').addEventListener('click', () => {
-        const sortedData = sortDataByViews(csvData); // Assuming csvData holds your table data
-        populateTable([csvData[0], ...sortedData]); // Re-populate the table with sorted data
-    });
-    
-
+function parseCSV(text) {
+    return text.split('\n').map(row => row.split(','));
+}
 
 function populateTable(data, searchText = '') {
+    const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
+    let count = 0; // Initialize a counter for the number of rows
     data.forEach((row, index) => {
         if (index === 0) return; // Skip header row
-
+        count++; // Increment count for each row
         const tr = document.createElement('tr');
         row.forEach((cell, cellIndex) => {
             const td = document.createElement('td');
 
-            // Format views
-            if (cellIndex === 7) { // Assuming 'Views' is the 8th column (index 7)
+            if (cellIndex === 7) { // Format 'Views' column
                 td.textContent = parseInt(cell).toLocaleString();
             } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
                 td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
@@ -37,44 +25,34 @@ function populateTable(data, searchText = '') {
                 td.textContent = cell;
             }
 
-                // Check if the cell is for the League column
-                if (cellIndex === 5) { // Assuming league is in the 6th column (index 5)
-                    const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`; // Name #1, Name #2, Event, League
-                    const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
-                    td.innerHTML = `<a href="${youtubeUrl}" target="_blank">${cell}</a>`;
-                }
+            if (cellIndex === 5) { // Link for 'League' column
+                const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`;
+                const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+                td.innerHTML = `<a href="${youtubeUrl}" target="_blank">${cell}</a>`;
+            }
 
-                tr.appendChild(td);
-            });
-            tableBody.appendChild(tr);
+            tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
     });
+    document.getElementById('search-results').textContent = `Search results: ${count}`;
 }
-    
-function sortDataByUploaded(data) {
-    // Assuming the 'Uploaded' column is now the 7th one (index 6)
-    return data.slice(1).sort((a, b) => {
-        // Check if the 'Uploaded' data exists in both rows
-        if (!a[6] || !b[6]) {
-            return !a[6] ? 1 : -1; // Sort rows with missing data to the end
-        }
 
-        // Extract dates from the 'Uploaded' column
+function sortDataByUploaded(data) {
+    return data.slice(1).sort((a, b) => {
+        if (!a[6] || !b[6]) {
+            return !a[6] ? 1 : -1;
+        }
         const datePattern = /(\d{4}-\d{1,2}-\d{1,2})/;
         const dateStringA = (a[6].match(datePattern) || [])[1];
         const dateStringB = (b[6].match(datePattern) || [])[1];
-
-        // Parse the dates
-        const dateA = dateStringA ? new Date(dateStringA) : new Date(0); // Fallback to epoch date if invalid
-        const dateB = dateStringB ? new Date(dateStringB) : new Date(0); // Fallback to epoch date if invalid
-
-        // Compare the dates
+        const dateA = dateStringA ? new Date(dateStringA) : new Date(0);
+        const dateB = dateStringB ? new Date(dateStringB) : new Date(0);
         return dateB - dateA;
     });
 }
 
-
 function sortDataByViews(data) {
-    // Assuming the 'Views' column is the 8th one
     return data.slice(1).sort((a, b) => {
         const viewsA = parseInt(a[7]);
         const viewsB = parseInt(b[7]);
@@ -82,54 +60,60 @@ function sortDataByViews(data) {
     });
 }
 
-    
+function searchTable(data) {
+    const searchText = document.getElementById('searchBox').value.toLowerCase();
+    const filteredData = data.filter((row, index) => {
+        if (index === 0) return true;
+        return row.some(cell => cell.toLowerCase().includes(searchText));
+    });
+    currentData = filteredData;
+    const numResults = filteredData.length - 1;
+    document.getElementById('search-results').textContent = `Search results: ${numResults}`;
+    populateTable(filteredData, searchText);
+}
 
-    function searchTable(data) {
-        const searchText = searchBox.value.toLowerCase();
-        const filteredData = data.filter((row, index) => {
-            if (index === 0) return true; // Always include header row
-            return row.some(cell => cell.toLowerCase().includes(searchText));
-        });
-    
-        // Update the number of search results
-        const numResults = filteredData.length - 1; // Subtract 1 for header row
-        document.getElementById('search-results').textContent = `Search results: ${numResults}`;
-    
-        populateTable(filteredData, searchBox.value); // Pass the current search text
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const searchBox = document.getElementById('searchBox');
 
-    //fetch('data.csv')
+    document.getElementById('sort-uploaded').addEventListener('click', () => {
+        const sortedData = sortDataByUploaded(csvData);
+        populateTable([csvData[0], ...sortedData]);
+    });
+
+    document.getElementById('sort-views').addEventListener('click', () => {
+        const sortedData = sortDataByViews(currentData);
+        populateTable([currentData[0], ...sortedData]);
+    });
+
+    searchBox.addEventListener('input', () => searchTable(csvData));
+
     fetch('battle_events.csv')
-    .then(response => response.text())
-    .then(text => {
-        csvData = parseCSV(text); // Update csvData with the parsed data
-        populateTable(csvData); // Populate the table with initial data
+        .then(response => response.text())
+        .then(text => {
+            csvData = parseCSV(text);
+            currentData = csvData; 
+            populateTable(csvData);
+        })
+        .catch(error => console.error('Error fetching the CSV file:', error));
 
-        // Update the initial search results count
-        const initialCount = csvData.length - 1; // Use csvData for count
-        document.getElementById('search-results').textContent = `Search results: ${initialCount}`;
-    })
-    .catch(error => console.error('Error fetching the CSV file:', error));
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            applyFilter(this.getAttribute('data-filter'));
+        });
+    });
 
-    searchBox.addEventListener('input', () => searchTable(csvData)); // Corrected event listener
+    fetch('info.yml')
+        .then(response => response.text())
+        .then(yamlText => {
+            const yamlData = jsyaml.load(yamlText);
+            const lastUpdatedTime = yamlData.last_updated_time;
+            const formattedDateTime = lastUpdatedTime.replace(/(\d{4}-\d{2}-\d{2}) (\d{2})-(\d{2})/, '$1 $2:$3');
+            document.getElementById('last-updated').textContent += formattedDateTime;
+        })
+        .catch(error => console.error('Error fetching or parsing the YAML file:', error));
 });
 
-fetch('info.yaml')
-    .then(response => response.text())
-    .then(yamlText => {
-        const yamlData = jsyaml.load(yamlText);
-
-        // Use the last_updated_time directly
-        const lastUpdatedTime = yamlData.last_updated_time;
-
-        // Replace the hyphen in the time part with a colon for display
-        const formattedDateTime = lastUpdatedTime.replace(/(\d{4}-\d{2}-\d{2}) (\d{2})-(\d{2})/, '$1 $2:$3');
-
-        document.getElementById('last-updated').textContent += formattedDateTime;
-    })
-    .catch(error => console.error('Error fetching or parsing the YAML file:', error));
-
-
-
-
-    
+function applyFilter(filter) {
+    document.getElementById('searchBox').value = filter;
+    searchTable(csvData);
+}

@@ -9,17 +9,29 @@
 </head>
 <body>
     <div class="container">
+        <div id="filters">
+            <button class="filter-btn" data-filter="DLTLLY">DLTLLY</button>
+            <button class="filter-btn" data-filter="DUDL">DUDL</button>
+            <button class="filter-btn" data-filter="SPOX">SPOX</button>
+            <button class="filter-btn" data-filter="FOB">FOB</button>
+            <button class="filter-btn" data-filter="🏆">🏆 </button>
+            <button class="filter-btn" data-filter="On Beat">On Beat</button>
+            <button class="filter-btn" data-filter="">Reset</button>
+            <!-- Add more filters as needed -->
+        </div>
         <input type="text" id="searchBox" placeholder="Search...">
         <div class="info-container">
             <div id="last-updated" class="info-text">Last updated: </div>
             <div id="search-results" class="info-text">Search results: 0</div>
-        </div>     
+        </div>
+        
+        
         <table id="data-table">
             <thead>
                 <tr>
                     <th>MC Name #1</th>
                     <th>MC Name #2</th>
-                    <th>Event</th>
+                    <th>Event / Ort</th>
                     <th>Type</th>
                     <th>Year</th>
                     <th>League</th>
@@ -31,7 +43,11 @@
                 <!-- Data rows will be inserted here -->
             </tbody>
         </table>
-        
+        <footer>
+            <div class="container">
+                <a href="subpage.html" class="footer-link">More Information</a>
+            </div>
+        </footer> 
     </div>
     <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
