@@ -90,6 +90,11 @@ function toggleDarkMode(on) {
     }
 }
 
+document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+    document.body.classList.toggle('dark-mode');
+});
+
+
 // Event listeners for the theme toggle buttons
 document.getElementById('dark-mode-btn').addEventListener('click', () => toggleDarkMode(true));
 document.getElementById('light-mode-btn').addEventListener('click', () => toggleDarkMode(false));
