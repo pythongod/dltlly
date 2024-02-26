@@ -78,6 +78,28 @@ function searchTable(data) {
     populateTable(filteredData, searchText);
 }
 
+// Function to toggle dark mode
+function toggleDarkMode(on) {
+    const body = document.body;
+    if(on) {
+        body.classList.add("dark-mode");
+        localStorage.setItem("theme", "dark");
+    } else {
+        body.classList.remove("dark-mode");
+        localStorage.setItem("theme", "light");
+    }
+}
+
+// Event listeners for the theme toggle buttons
+document.getElementById('dark-mode-btn').addEventListener('click', () => toggleDarkMode(true));
+document.getElementById('light-mode-btn').addEventListener('click', () => toggleDarkMode(false));
+
+// Check local storage for theme preference and apply it
+document.addEventListener('DOMContentLoaded', (event) => {
+    const preferredTheme = localStorage.getItem("theme");
+    toggleDarkMode(preferredTheme === "dark");
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const searchBox = document.getElementById('searchBox');
 

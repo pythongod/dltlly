@@ -162,3 +162,56 @@ footer .container {
     border-bottom: 5px solid black; /* Triangle color */
     transform: translateY(-50%);
 }
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode .container {
+    background-color: #242424;
+}
+
+body.dark-mode table {
+    box-shadow: 0px 0px 8px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode th, body.dark-mode td {
+    border-bottom: 1px solid #444;
+}
+
+body.dark-mode th {
+    background-color: #333;
+    color: #ffffff;
+}
+
+body.dark-mode tr:nth-child(even) {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode tr:hover {
+    background-color: #2a2a2a;
+}
+
+body.dark-mode .filter-btn {
+    border: 1px solid #444;
+    background-color: #333;
+    color: #fff;
+}
+
+body.dark-mode .filter-btn:hover {
+    background-color: #2a2a2a;
+}
+
+body.dark-mode .footer-link {
+    color: #bbbbff;
+}
+
+.theme-toggle-btn {
+    cursor: pointer;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: inherit;
+}
