@@ -97,7 +97,7 @@ document.getElementById('dark-mode-toggle').addEventListener('click', function()
 // Check local storage for theme preference and apply it
 document.addEventListener('DOMContentLoaded', (event) => {
     const preferredTheme = localStorage.getItem("theme");
-    toggleDarkMode(preferredTheme === "dark");
+    toggleDarkMode(preferredTheme === "light");
 });
 
 document.addEventListener('DOMContentLoaded', function() {
