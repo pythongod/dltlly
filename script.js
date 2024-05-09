@@ -15,9 +15,11 @@ function populateTable(data, searchText = '') {
         count++; // Increment count for each row
         const tr = document.createElement('tr');
         row.forEach((cell, cellIndex) => {
+            if (cellIndex === 8) return; // Skip the ID column
+
             const td = document.createElement('td');
 
-            if (cellIndex === 7) { // Format 'Views' column
+            if (cellIndex === 7) { // Correct this to match the 'Views' column if indices changed
                 td.textContent = parseInt(cell).toLocaleString();
             } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
                 td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
@@ -25,7 +27,7 @@ function populateTable(data, searchText = '') {
                 td.textContent = cell;
             }
 
-            if (cellIndex === 5) { // Link for 'League' column
+            if (cellIndex === 5) { // Correct this if the indices shift due to column removal
                 const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`;
                 const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
                 td.innerHTML = `<a href="${youtubeUrl}" target="_blank">${cell}</a>`;
