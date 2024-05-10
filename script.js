@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchBox.addEventListener('input', () => searchTable(csvData));
 
-    fetch('battle_events.csv')
+    fetch('/data/battle_events.csv')
         .then(response => response.text())
         .then(text => {
             csvData = parseCSV(text);
