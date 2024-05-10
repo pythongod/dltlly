@@ -59,8 +59,8 @@ function sortDataByUploaded(data) {
 
 function sortDataByViews(data, isAscending) {
     return data.slice(1).sort((a, b) => {
-        const viewsA = parseInt(a[7]);
-        const viewsB = parseInt(b[7]);
+        const viewsA = parseInt(a[9]);
+        const viewsB = parseInt(b[9]);
 
         if (isAscending) {
             return viewsA - viewsB; // For ascending order
