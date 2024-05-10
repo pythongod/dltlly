@@ -29,7 +29,7 @@ function populateTable(data, searchText = '') {
                 td.textContent = cell;
             }
 
-            if (cellIndex === 5) { // Correct this if the indices shift due to column removal
+            if (cellIndex === 7) { // Correct this if the indices shift due to column removal
                 //const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`;
                 const URL = `${row[7]} ${cell}`;
                 //const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
