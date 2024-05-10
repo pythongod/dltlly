@@ -88,7 +88,7 @@ function searchTable(data) {
 // Function to toggle dark mode
 function toggleDarkMode(on) {
     const body = document.body;
-    if(on) {
+    if (on) {
         body.classList.add("dark-mode");
         localStorage.setItem("theme", "dark");
     } else {
@@ -98,13 +98,18 @@ function toggleDarkMode(on) {
 }
 
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
-    document.body.classList.toggle('dark-mode');
+    const isDarkMode = document.body.classList.toggle('dark-mode');
+    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
 });
 
 // Check local storage for theme preference and apply it
 document.addEventListener('DOMContentLoaded', (event) => {
+    // Retrieve the preferred theme from local storage
     const preferredTheme = localStorage.getItem("theme");
-    toggleDarkMode(preferredTheme === "light");
+    
+    // Apply dark mode only if the stored theme is 'dark'
+    const isDarkMode = preferredTheme === "dark";
+    toggleDarkMode(isDarkMode);
 });
 
 document.addEventListener('DOMContentLoaded', function() {
