@@ -1,6 +1,8 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
 
+// 0 Name #1, 1 Name #2, 2 Event,3 Type,4 Year,5 Channel, 6 Uploaded,7 URL, 8 ID, 9 Views
+
 
 function parseCSV(text) {
     return text.split('\n').map(row => row.split(','));
@@ -28,9 +30,10 @@ function populateTable(data, searchText = '') {
             }
 
             if (cellIndex === 5) { // Correct this if the indices shift due to column removal
-                const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`;
+                //const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`;
+                const URL = `${row[7]} ${cell}`;
                 const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
-                td.innerHTML = `<a href="${youtubeUrl}" target="_blank">${cell}</a>`;
+                td.innerHTML = `<a href="${URL}" target="_blank">${cell}</a>`;
             }
 
             tr.appendChild(td);
