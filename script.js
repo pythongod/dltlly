@@ -31,9 +31,11 @@ function populateTable(data, searchText = '') {
 
             if (cellIndex === 7) { // Correct this if the indices shift due to column removal
                 //const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`;
-                const URL = `${row[7]} ${cell}`;
+                //const URL = `${row[7]} ${cell}`;
+                const URL = `${row[7]}`;
+                const URLtext = 'Link'
                 //const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
-                td.innerHTML = `<a href="${URL}" target="_blank">${cell}</a>`;
+                td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
             }
 
             tr.appendChild(td);
