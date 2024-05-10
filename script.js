@@ -21,7 +21,7 @@ function populateTable(data, searchText = '') {
 
             const td = document.createElement('td');
 
-            if (cellIndex === 7) { // Correct this to match the 'Views' column if indices changed
+            if (cellIndex === 9) { // Correct this to match the 'Views' column if indices changed
                 td.textContent = parseInt(cell).toLocaleString();
             } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
                 td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
