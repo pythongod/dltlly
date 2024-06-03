@@ -1,5 +1,7 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
+const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSTQCuvOmXn1mJTpP8Xsxs_hQGuGvKgWuvbb_ZwvuM2rCb0hBmNUOEKiyk25-hy5ljG-4tCuLqVwrRx/pub?gid=1245526804&single=true&output=csv';
+const localCSVURL = '/data/battle_events.csv';
 
 // Function to parse CSV text into a 2D array
 function parseCSV(text) {
@@ -95,7 +97,18 @@ function toggleDarkMode(on) {
     }
 }
 
-// Event listener for dark mode toggle
+// Function to fetch data from a given URL and populate the table
+function fetchData(url) {
+    fetch(url)
+        .then(response => response.text())
+        .then(text => {
+            csvData = parseCSV(text);
+            currentData = csvData;
+            populateTable(csvData);
+        })
+        .catch(error => console.error('Error fetching the CSV file:', error));
+}
+
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     const isDarkMode = document.body.classList.toggle('dark-mode');
     localStorage.setItem("theme", isDarkMode ? "dark" : "light");
@@ -132,14 +145,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchBox.addEventListener('input', () => searchTable(csvData));
 
-    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSTQCuvOmXn1mJTpP8Xsxs_hQGuGvKgWuvbb_ZwvuM2rCb0hBmNUOEKiyk25-hy5ljG-4tCuLqVwrRx/pub?gid=1245526804&single=true&output=csv')
-        .then(response => response.text())
-        .then(text => {
-            csvData = parseCSV(text);
-            currentData = csvData; 
-            populateTable(csvData);
-        })
-        .catch(error => console.error('Error fetching the CSV file:', error));
+    document.querySelectorAll('.data-source-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const source = this.getAttribute('data-source');
+            if (source === 'google-sheet') {
+                fetchData(googleSheetURL);
+            } else if (source === 'local-csv') {
+                fetchData(localCSVURL);
+            }
+        });
+    });
+
+    // Initial fetch from the local CSV file
+    fetchData(localCSVURL);
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
