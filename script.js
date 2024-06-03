@@ -1,13 +1,12 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
 
-// 0 Name #1, 1 Name #2, 2 Event,3 Type,4 Year,5 Channel, 6 Uploaded,7 URL, 8 ID, 9 Views
-
-
+// Function to parse CSV text into a 2D array
 function parseCSV(text) {
     return text.split('\n').map(row => row.split(','));
 }
 
+// Function to populate the table with data
 function populateTable(data, searchText = '') {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
@@ -30,11 +29,8 @@ function populateTable(data, searchText = '') {
             }
 
             if (cellIndex === 7) { // Correct this if the indices shift due to column removal
-                //const searchQuery = `${row[0]} ${row[1]} ${row[2]} ${cell}`;
-                //const URL = `${row[7]} ${cell}`;
                 const URL = `${row[7]}`;
-                const URLtext = 'Link'
-                //const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+                const URLtext = 'Link';
                 td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
             }
 
@@ -45,6 +41,7 @@ function populateTable(data, searchText = '') {
     document.getElementById('search-results').textContent = `Search results: ${count}`;
 }
 
+// Function to sort data by uploaded date
 function sortDataByUploaded(data) {
     return data.slice(1).sort((a, b) => {
         if (!a[6] || !b[6]) {
@@ -59,6 +56,7 @@ function sortDataByUploaded(data) {
     });
 }
 
+// Function to sort data by views
 function sortDataByViews(data, isAscending) {
     return data.slice(1).sort((a, b) => {
         const viewsA = parseInt(a[9]);
@@ -72,7 +70,7 @@ function sortDataByViews(data, isAscending) {
     });
 }
 
-
+// Function to search within the table
 function searchTable(data) {
     const searchText = document.getElementById('searchBox').value.toLowerCase();
     const filteredData = data.filter((row, index) => {
@@ -97,6 +95,7 @@ function toggleDarkMode(on) {
     }
 }
 
+// Event listener for dark mode toggle
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     const isDarkMode = document.body.classList.toggle('dark-mode');
     localStorage.setItem("theme", isDarkMode ? "dark" : "light");
@@ -133,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchBox.addEventListener('input', () => searchTable(csvData));
 
-    fetch('/data/battle_events.csv')
+    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSTQCuvOmXn1mJTpP8Xsxs_hQGuGvKgWuvbb_ZwvuM2rCb0hBmNUOEKiyk25-hy5ljG-4tCuLqVwrRx/pub?gid=1245526804&single=true&output=csv')
         .then(response => response.text())
         .then(text => {
             csvData = parseCSV(text);
