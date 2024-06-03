@@ -2,7 +2,6 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
-
 input#searchBox {
     width: 100%;
     padding: 10px 15px;
@@ -17,40 +16,35 @@ input#searchBox {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%; /* Ensure the container spans the full width */
+    width: 100%;
 }
 
 .info-text {
-    /* Remove the margin rule if it's causing layout issues */
     font-size: 14px;
     color: #666;
     margin: 5px 0;
 }
 
-/* If you still want to use text-align for the content inside the divs */
 #search-results {
-    text-align: left; /* Aligns text inside the div to the left */
+    text-align: left;
 }
 
 #last-updated {
-    text-align: right; /* Aligns text inside the div to the right */
+    text-align: right;
 }
 
 .highlight {
-    /* background-color: rgba(255, 255, 0, 0.672); */
     font-weight: bold;
 }
 
-
 .container > * {
-    margin-bottom: 10px; /* Uniform bottom margin for all direct children */
+    margin-bottom: 10px;
 }
 
 #searchBox, #data-table {
     width: 100%;
     box-sizing: border-box;
 }
-
 
 table {
     width: 100%;
@@ -88,6 +82,7 @@ tr:hover {
         white-space: nowrap;
     }
 }
+
 .container {
     width: 90%;
     max-width: 1200px;
@@ -116,36 +111,29 @@ footer .container {
 
 #filters {
     margin-top: 10px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.filter-btn {
-    padding: 5px 10px;
-    margin-right: 5px;
+.filter-btn, .data-source-btn {
+    padding: 8px 12px;
     border: 1px solid #ddd;
     background-color: #f4f4f4;
     cursor: pointer;
+    font-size: 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.filter-btn:hover {
-    background-color: #e9e9e9;
-}
-
-.data-source-btn {
-    padding: 5px 10px;
-    margin-right: 5px;
-    border: 1px solid #ddd;
-    background-color: #f4f4f4;
-    cursor: pointer;
-}
-
-.data-source-btn:hover {
+.filter-btn:hover, .data-source-btn:hover {
     background-color: #e9e9e9;
 }
 
 #sort-views {
     cursor: pointer;
-    position: relative; /* Needed for absolute positioning of the pseudo-element */
+    position: relative;
 }
 
 #sort-views:hover {
@@ -156,11 +144,11 @@ footer .container {
 #sort-views.asc:after {
     content: '';
     position: absolute;
-    right: 5px; /* Adjust as needed */
+    right: 5px;
     top: 50%;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 5px solid black; /* Triangle color */
+    border-top: 5px solid black;
     transform: translateY(-50%);
 }
 
@@ -168,11 +156,11 @@ footer .container {
 #sort-views.desc:after {
     content: '';
     position: absolute;
-    right: 5px; /* Adjust as needed */
+    right: 5px;
     top: 50%;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-bottom: 5px solid black; /* Triangle color */
+    border-bottom: 5px solid black;
     transform: translateY(-50%);
 }
 
@@ -207,13 +195,13 @@ body.dark-mode tr:hover {
     background-color: #2a2a2a;
 }
 
-body.dark-mode .filter-btn {
+body.dark-mode .filter-btn, body.dark-mode .data-source-btn {
     border: 1px solid #444;
     background-color: #333;
     color: #fff;
 }
 
-body.dark-mode .filter-btn:hover {
+body.dark-mode .filter-btn:hover, body.dark-mode .data-source-btn:hover {
     background-color: #2a2a2a;
 }
 
@@ -229,32 +217,18 @@ body.dark-mode .footer-link {
     color: inherit;
 }
 
-body.dark-mode {
-    background-color: #333;
-    color: #fff;
-}
-
-body.dark-mode .filter-btn,
-body.dark-mode #dark-mode-toggle {
-    background-color: #555;
-    color: white;
-    border-color: #666;
-}
-
-/* Adjust other styles as needed for dark mode */
 .dark-mode a {
-    color: #a9ecf5; /* A light blue color that stands out on dark backgrounds */
+    color: #a9ecf5;
     text-decoration: underline;
-    text-decoration-style: dotted; /* Optional: for a dotted underline */
-    border-bottom: none; /* Remove if using text-decoration */
-  }
-  
-  .dark-mode a:hover, .dark-mode a:focus {
-    color: #ffffff; /* A brighter color for hover and focus states */
-    background-color: #555555; /* Optional: for background highlight on hover/focus */
-  }
-  
-  .dark-mode a:visited {
-    color: #c7a2ff; /* A purple hue for visited links */
-  }
-  
+    text-decoration-style: dotted;
+    border-bottom: none;
+}
+
+.dark-mode a:hover, .dark-mode a:focus {
+    color: #ffffff;
+    background-color: #555555;
+}
+
+.dark-mode a:visited {
+    color: #c7a2ff;
+}
