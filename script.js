@@ -188,8 +188,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const handleSearchGoogleSheet = () => searchTable(csvData, searchBox.value, true);
     const handleSearchLocal = () => searchTable(csvData, searchBox.value, false);
 
-    // Initial fetch from the local CSV file or Google Sheet based on the default or URL parameter
+    // Update table headers before fetching data
     const isGoogleSheet = initialSource === 'google-sheet';
+    updateTableHeaders(isGoogleSheet);
+
+    // Initial fetch from the local CSV file or Google Sheet based on the default or URL parameter
     if (isGoogleSheet) {
         fetchData(googleSheetURL, true, searchText);
         searchBox.addEventListener('input', handleSearchGoogleSheet);
