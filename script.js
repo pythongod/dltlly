@@ -9,7 +9,7 @@ function parseCSV(text) {
 }
 
 // Function to populate the table with data
-function populateTable(data, searchText = '') {
+function populateTable(data, searchText = '', showAdditionalColumns = false) {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
     let count = 0; // Initialize a counter for the number of rows
@@ -36,7 +36,11 @@ function populateTable(data, searchText = '') {
                 td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
             }
 
-            tr.appendChild(td);
+            if (showAdditionalColumns && (cellIndex === 10 || cellIndex === 11 || cellIndex === 12)) {
+                tr.appendChild(td);
+            } else if (cellIndex < 10) {
+                tr.appendChild(td);
+            }
         });
         tableBody.appendChild(tr);
     });
@@ -73,16 +77,24 @@ function sortDataByViews(data, isAscending) {
 }
 
 // Function to search within the table
-function searchTable(data) {
-    const searchText = document.getElementById('searchBox').value.toLowerCase();
+function searchTable(data, searchText, showAdditionalColumns = false) {
     const filteredData = data.filter((row, index) => {
         if (index === 0) return true;
-        return row.some(cell => cell.toLowerCase().includes(searchText));
+        return row.some((cell, cellIndex) => {
+            if (!showAdditionalColumns && cellIndex >= 10) return false;
+            return cell.toLowerCase().includes(searchText.toLowerCase());
+        });
     });
     currentData = filteredData;
     const numResults = filteredData.length - 1;
     document.getElementById('search-results').textContent = `Search results: ${numResults}`;
-    populateTable(filteredData, searchText);
+    populateTable(filteredData, searchText, showAdditionalColumns);
+}
+
+// Function to get URL parameters
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
 }
 
 // Function to toggle dark mode
@@ -98,13 +110,17 @@ function toggleDarkMode(on) {
 }
 
 // Function to fetch data from a given URL and populate the table
-function fetchData(url) {
+function fetchData(url, showAdditionalColumns = false, searchText = '') {
     fetch(url)
         .then(response => response.text())
         .then(text => {
             csvData = parseCSV(text);
             currentData = csvData;
-            populateTable(csvData);
+            if (searchText) {
+                searchTable(csvData, searchText, showAdditionalColumns);
+            } else {
+                populateTable(csvData, '', showAdditionalColumns);
+            }
         })
         .catch(error => console.error('Error fetching the CSV file:', error));
 }
@@ -126,6 +142,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 document.addEventListener('DOMContentLoaded', function() {
     const searchBox = document.getElementById('searchBox');
+    const searchText = getUrlParameter('search') || '';
+    const initialSource = getUrlParameter('source') || 'local-csv';
 
     document.getElementById('sort-uploaded').addEventListener('click', () => {
         const sortedData = sortDataByUploaded(csvData);
@@ -143,21 +161,47 @@ document.addEventListener('DOMContentLoaded', function() {
         populateTable([currentData[0], ...sortedData]);
     });
 
-    searchBox.addEventListener('input', () => searchTable(csvData));
+    searchBox.addEventListener('input', () => {
+        const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
+        searchTable(csvData, searchBox.value, isGoogleSheet);
+    });
 
     document.querySelectorAll('.data-source-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             if (source === 'google-sheet') {
-                fetchData(googleSheetURL);
+                fetchData(googleSheetURL, true, searchText);
+                updateTableHeaders(true);
+                searchBox.removeEventListener('input', handleSearchLocal);
+                searchBox.addEventListener('input', handleSearchGoogleSheet);
             } else if (source === 'local-csv') {
-                fetchData(localCSVURL);
+                fetchData(localCSVURL, false, searchText);
+                updateTableHeaders(false);
+                searchBox.removeEventListener('input', handleSearchGoogleSheet);
+                searchBox.addEventListener('input', handleSearchLocal);
             }
+            document.querySelectorAll('.data-source-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         });
     });
 
-    // Initial fetch from the local CSV file
-    fetchData(localCSVURL);
+    const handleSearchGoogleSheet = () => searchTable(csvData, searchBox.value, true);
+    const handleSearchLocal = () => searchTable(csvData, searchBox.value, false);
+
+    // Update table headers before fetching data
+    const isGoogleSheet = initialSource === 'google-sheet';
+    updateTableHeaders(isGoogleSheet);
+
+    // Initial fetch from the local CSV file or Google Sheet based on the default or URL parameter
+    if (isGoogleSheet) {
+        fetchData(googleSheetURL, true, searchText);
+        searchBox.addEventListener('input', handleSearchGoogleSheet);
+    } else {
+        fetchData(localCSVURL, false, searchText);
+        searchBox.addEventListener('input', handleSearchLocal);
+    }
+    document.querySelector(`.data-source-btn[data-source="${initialSource}"]`).classList.add('active');
+    searchBox.value = searchText;
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -178,5 +222,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
-    searchTable(csvData);
+    const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
+    searchTable(csvData, filter, isGoogleSheet);
+}
+
+// Function to update table headers based on the selected data source
+function updateTableHeaders(showAdditionalColumns) {
+    const thead = document.getElementById('data-table').getElementsByTagName('thead')[0];
+    thead.innerHTML = `
+        <tr>
+            <th>MC Name #1</th>
+            <th>MC Name #2</th>
+            <th>Event / Ort</th>
+            <th>Type</th>
+            <th>Year</th>
+            <th>League</th>
+            <th id="sort-uploaded">Uploaded</th>
+            <th>URL</th>
+            <th id="sort-views" title="Click to sort by views">Views</th>
+            ${showAdditionalColumns ? '<th>Location</th><th>Stadt</th><th>Event</th>' : ''}
+        </tr>`;
 }
