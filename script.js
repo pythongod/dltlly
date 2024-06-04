@@ -9,7 +9,7 @@ function parseCSV(text) {
 }
 
 // Function to populate the table with data
-function populateTable(data, searchText = '') {
+function populateTable(data, searchText = '', showAdditionalColumns = false) {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
     let count = 0; // Initialize a counter for the number of rows
@@ -36,7 +36,11 @@ function populateTable(data, searchText = '') {
                 td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
             }
 
-            tr.appendChild(td);
+            if (showAdditionalColumns && (cellIndex === 10 || cellIndex === 11 || cellIndex === 12)) {
+                tr.appendChild(td);
+            } else if (cellIndex < 10) {
+                tr.appendChild(td);
+            }
         });
         tableBody.appendChild(tr);
     });
@@ -98,13 +102,13 @@ function toggleDarkMode(on) {
 }
 
 // Function to fetch data from a given URL and populate the table
-function fetchData(url) {
+function fetchData(url, showAdditionalColumns = false) {
     fetch(url)
         .then(response => response.text())
         .then(text => {
             csvData = parseCSV(text);
             currentData = csvData;
-            populateTable(csvData);
+            populateTable(csvData, '', showAdditionalColumns);
         })
         .catch(error => console.error('Error fetching the CSV file:', error));
 }
@@ -149,15 +153,17 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             if (source === 'google-sheet') {
-                fetchData(googleSheetURL);
+                fetchData(googleSheetURL, true);
+                updateTableHeaders(true);
             } else if (source === 'local-csv') {
-                fetchData(localCSVURL);
+                fetchData(localCSVURL, false);
+                updateTableHeaders(false);
             }
         });
     });
 
     // Initial fetch from the local CSV file
-    fetchData(localCSVURL);
+    fetchData(localCSVURL, false);
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -179,4 +185,22 @@ document.addEventListener('DOMContentLoaded', function() {
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
     searchTable(csvData);
+}
+
+// Function to update table headers based on the selected data source
+function updateTableHeaders(showAdditionalColumns) {
+    const thead = document.getElementById('data-table').getElementsByTagName('thead')[0];
+    thead.innerHTML = `
+        <tr>
+            <th>MC Name #1</th>
+            <th>MC Name #2</th>
+            <th>Event / Ort</th>
+            <th>Type</th>
+            <th>Year</th>
+            <th>League</th>
+            <th id="sort-uploaded">Uploaded</th>
+            <th>URL</th>
+            <th id="sort-views" title="Click to sort by views">Views</th>
+            ${showAdditionalColumns ? '<th>Location</th><th>Stadt</th><th>Event</th>' : ''}
+        </tr>`;
 }
