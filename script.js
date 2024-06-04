@@ -77,19 +77,24 @@ function sortDataByViews(data, isAscending) {
 }
 
 // Function to search within the table
-function searchTable(data, showAdditionalColumns = false) {
-    const searchText = document.getElementById('searchBox').value.toLowerCase();
+function searchTable(data, searchText, showAdditionalColumns = false) {
     const filteredData = data.filter((row, index) => {
         if (index === 0) return true;
         return row.some((cell, cellIndex) => {
             if (!showAdditionalColumns && cellIndex >= 10) return false;
-            return cell.toLowerCase().includes(searchText);
+            return cell.toLowerCase().includes(searchText.toLowerCase());
         });
     });
     currentData = filteredData;
     const numResults = filteredData.length - 1;
     document.getElementById('search-results').textContent = `Search results: ${numResults}`;
     populateTable(filteredData, searchText, showAdditionalColumns);
+}
+
+// Function to get URL parameters
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
 }
 
 // Function to toggle dark mode
@@ -105,13 +110,17 @@ function toggleDarkMode(on) {
 }
 
 // Function to fetch data from a given URL and populate the table
-function fetchData(url, showAdditionalColumns = false) {
+function fetchData(url, showAdditionalColumns = false, searchText = '') {
     fetch(url)
         .then(response => response.text())
         .then(text => {
             csvData = parseCSV(text);
             currentData = csvData;
-            populateTable(csvData, '', showAdditionalColumns);
+            if (searchText) {
+                searchTable(csvData, searchText, showAdditionalColumns);
+            } else {
+                populateTable(csvData, '', showAdditionalColumns);
+            }
         })
         .catch(error => console.error('Error fetching the CSV file:', error));
 }
@@ -133,6 +142,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 document.addEventListener('DOMContentLoaded', function() {
     const searchBox = document.getElementById('searchBox');
+    const searchText = getUrlParameter('search') || '';
 
     document.getElementById('sort-uploaded').addEventListener('click', () => {
         const sortedData = sortDataByUploaded(csvData);
@@ -150,31 +160,45 @@ document.addEventListener('DOMContentLoaded', function() {
         populateTable([currentData[0], ...sortedData]);
     });
 
-    searchBox.addEventListener('input', () => searchTable(csvData));
+    searchBox.addEventListener('input', () => {
+        const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
+        searchTable(csvData, searchBox.value, isGoogleSheet);
+    });
 
     document.querySelectorAll('.data-source-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             if (source === 'google-sheet') {
-                fetchData(googleSheetURL, true);
+                fetchData(googleSheetURL, true, searchText);
                 updateTableHeaders(true);
                 searchBox.removeEventListener('input', handleSearchLocal);
                 searchBox.addEventListener('input', handleSearchGoogleSheet);
             } else if (source === 'local-csv') {
-                fetchData(localCSVURL, false);
+                fetchData(localCSVURL, false, searchText);
                 updateTableHeaders(false);
                 searchBox.removeEventListener('input', handleSearchGoogleSheet);
                 searchBox.addEventListener('input', handleSearchLocal);
             }
+            document.querySelectorAll('.data-source-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         });
     });
 
-    const handleSearchGoogleSheet = () => searchTable(csvData, true);
-    const handleSearchLocal = () => searchTable(csvData, false);
+    const handleSearchGoogleSheet = () => searchTable(csvData, searchBox.value, true);
+    const handleSearchLocal = () => searchTable(csvData, searchBox.value, false);
 
-    // Initial fetch from the local CSV file
-    fetchData(localCSVURL, false);
-    searchBox.addEventListener('input', handleSearchLocal);
+    // Initial fetch from the local CSV file or Google Sheet based on the default or URL parameter
+    const initialSource = getUrlParameter('source') || 'local-csv';
+    const isGoogleSheet = initialSource === 'google-sheet';
+    if (isGoogleSheet) {
+        fetchData(googleSheetURL, true, searchText);
+        searchBox.addEventListener('input', handleSearchGoogleSheet);
+    } else {
+        fetchData(localCSVURL, false, searchText);
+        searchBox.addEventListener('input', handleSearchLocal);
+    }
+    document.querySelector(`.data-source-btn[data-source="${initialSource}"]`).classList.add('active');
+    searchBox.value = searchText;
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -196,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
     const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
-    searchTable(csvData, isGoogleSheet);
+    searchTable(csvData, filter, isGoogleSheet);
 }
 
 // Function to update table headers based on the selected data source
