@@ -77,16 +77,19 @@ function sortDataByViews(data, isAscending) {
 }
 
 // Function to search within the table
-function searchTable(data) {
+function searchTable(data, showAdditionalColumns = false) {
     const searchText = document.getElementById('searchBox').value.toLowerCase();
     const filteredData = data.filter((row, index) => {
         if (index === 0) return true;
-        return row.some(cell => cell.toLowerCase().includes(searchText));
+        return row.some((cell, cellIndex) => {
+            if (!showAdditionalColumns && cellIndex >= 10) return false;
+            return cell.toLowerCase().includes(searchText);
+        });
     });
     currentData = filteredData;
     const numResults = filteredData.length - 1;
     document.getElementById('search-results').textContent = `Search results: ${numResults}`;
-    populateTable(filteredData, searchText);
+    populateTable(filteredData, searchText, showAdditionalColumns);
 }
 
 // Function to toggle dark mode
@@ -155,15 +158,23 @@ document.addEventListener('DOMContentLoaded', function() {
             if (source === 'google-sheet') {
                 fetchData(googleSheetURL, true);
                 updateTableHeaders(true);
+                searchBox.removeEventListener('input', handleSearchLocal);
+                searchBox.addEventListener('input', handleSearchGoogleSheet);
             } else if (source === 'local-csv') {
                 fetchData(localCSVURL, false);
                 updateTableHeaders(false);
+                searchBox.removeEventListener('input', handleSearchGoogleSheet);
+                searchBox.addEventListener('input', handleSearchLocal);
             }
         });
     });
 
+    const handleSearchGoogleSheet = () => searchTable(csvData, true);
+    const handleSearchLocal = () => searchTable(csvData, false);
+
     // Initial fetch from the local CSV file
     fetchData(localCSVURL, false);
+    searchBox.addEventListener('input', handleSearchLocal);
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -184,7 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
-    searchTable(csvData);
+    const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
+    searchTable(csvData, isGoogleSheet);
 }
 
 // Function to update table headers based on the selected data source
