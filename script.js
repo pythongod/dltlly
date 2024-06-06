@@ -122,7 +122,13 @@ function fetchData(url, showAdditionalColumns = false, searchText = '') {
                 populateTable(csvData, '', showAdditionalColumns);
             }
         })
-        .catch(error => console.error('Error fetching the CSV file:', error));
+        .catch(error => {
+            console.error('Error fetching the CSV file:', error);
+            if (url !== localCSVURL) {
+                console.log('Falling back to local CSV file.');
+                fetchData(localCSVURL, showAdditionalColumns, searchText);
+            }
+        });
 }
 
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
