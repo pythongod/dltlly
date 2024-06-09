@@ -60,14 +60,12 @@ input#searchBox {
     width: 100%;
     border-collapse: collapse;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
-    table-layout: fixed; /* Ensures the table has fixed layout */
 }
 
 th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-    word-wrap: break-word; /* Ensures text wraps within the cell */
 }
 
 th {
