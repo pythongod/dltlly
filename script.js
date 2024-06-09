@@ -245,6 +245,31 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error fetching or parsing the YAML file:', error));
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
+
+    youtubeLinks.forEach(link => {
+        const tooltip = document.createElement('div');
+        tooltip.classList.add('tooltiptext');
+
+        link.classList.add('tooltip');
+        link.appendChild(tooltip);
+
+        link.addEventListener('mouseover', function() {
+            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+            if (videoId) {
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
+            }
+        });
+
+        link.addEventListener('mouseleave', function() {
+            tooltip.innerHTML = ''; // Clear the tooltip content
+        });
+    });
+});
+
+
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
     const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
