@@ -36,9 +36,7 @@ function populateTable(data, searchText = '') {
                 td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
             }
 
-            if (cellIndex < 10 || (cellIndex >= 10 && showAdditionalColumns)) {
-                tr.appendChild(td);
-            }
+            tr.appendChild(td);
         });
         tableBody.appendChild(tr);
     });
@@ -114,7 +112,7 @@ function fetchData(url, searchText = '') {
             if (searchText) {
                 searchTable(csvData, searchText);
             } else {
-                populateTable(csvData, '');
+                populateTable(csvData, searchText);
             }
         })
         .catch(error => console.error('Error fetching the CSV file:', error));
