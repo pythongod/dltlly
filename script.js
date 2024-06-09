@@ -34,7 +34,7 @@ function populateTable(data, searchText = '', showAdditionalColumns = false) {
             if (cellIndex === 7) { // Correct this if the indices shift due to column removal
                 const URL = `${row[7]}`;
                 const URLtext = 'Link';
-                td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
+                td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             }
 
             if (showAdditionalColumns && (cellIndex === 10 || cellIndex === 11 || cellIndex === 12)) {
@@ -46,6 +46,7 @@ function populateTable(data, searchText = '', showAdditionalColumns = false) {
         tableBody.appendChild(tr);
     });
     document.getElementById('search-results').textContent = `Search results: ${count}`;
+    addYouTubeThumbnails(); // Add YouTube thumbnails after populating the table
 }
 
 // Function to sort data by uploaded date
@@ -245,15 +246,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error fetching or parsing the YAML file:', error));
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+// Function to add YouTube thumbnails on hover
+function addYouTubeThumbnails() {
     const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
 
     youtubeLinks.forEach(link => {
-        const tooltip = document.createElement('div');
-        tooltip.classList.add('tooltiptext');
-
-        link.classList.add('tooltip');
-        link.appendChild(tooltip);
+        const tooltip = link.querySelector('.tooltiptext');
 
         link.addEventListener('mouseover', function() {
             const videoId = new URLSearchParams(new URL(link.href).search).get('v');
@@ -267,8 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tooltip.innerHTML = ''; // Clear the tooltip content
         });
     });
-});
-
+}
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
