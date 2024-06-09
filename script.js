@@ -82,7 +82,6 @@ function searchTable(data, searchText, showAdditionalColumns = false) {
     const filteredData = data.filter((row, index) => {
         if (index === 0) return true;
         return row.some((cell, cellIndex) => {
-            if (!showAdditionalColumns && cellIndex >= 10) return false;
             return cell.toLowerCase().includes(searchText.toLowerCase());
         });
     });
