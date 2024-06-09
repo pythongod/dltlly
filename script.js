@@ -110,7 +110,7 @@ function toggleDarkMode(on) {
     }
 }
 
-// Function to fetch data from a given URL and populate the table
+// Function to fetch data from a given URL and populate the table 
 function fetchData(url, showAdditionalColumns = false, searchText = '', updateTable = true) {
     return fetch(url)
         .then(response => response.text())
