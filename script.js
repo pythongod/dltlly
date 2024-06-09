@@ -110,7 +110,7 @@ function toggleDarkMode(on) {
     }
 }
 
-// Function to fetch data from a given URL and populate the table 
+// Function to fetch data from a given URL and populate the table
 function fetchData(url, showAdditionalColumns = false, searchText = '', updateTable = true) {
     return fetch(url)
         .then(response => response.text())
@@ -181,8 +181,15 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             if (source === 'google-sheet') {
-                fetchData(googleSheetURL, true, searchText)
-                    .then(() => updateTableHeaders(true))
+                fetchData(localGsheetCSVURL, true, searchText)
+                    .then(() => {
+                        updateTableHeaders(true);
+                        return fetchData(googleSheetURL, true, searchText, false);
+                    })
+                    .then(() => {
+                        populateTable(csvData, searchText, true);
+                        console.log('Table updated with latest Google Sheets data.');
+                    })
                     .catch(() => console.error('Failed to load Google Sheets data.'));
             } else if (source === 'local-csv') {
                 fetchData(localCSVURL, false, searchText)
@@ -202,24 +209,22 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTableHeaders(isGoogleSheet);
 
     // Initial fetch from the local CSV file or Google Sheet based on the default or URL parameter
-    fetchData(localGsheetCSVURL, false, searchText)
-        .then(() => {
-            if (isGoogleSheet) {
-                fetchData(googleSheetURL, true, searchText)
-                    .then(() => searchBox.addEventListener('input', handleSearchGoogleSheet))
-                    .catch(() => searchBox.addEventListener('input', handleSearchLocal));
-            } else {
-                searchBox.addEventListener('input', handleSearchLocal);
-            }
-        })
-        .catch(() => {
-            console.error('Failed to load initial local Gsheet CSV data.');
-            if (isGoogleSheet) {
-                fetchData(googleSheetURL, true, searchText)
-                    .then(() => searchBox.addEventListener('input', handleSearchGoogleSheet))
-                    .catch(() => console.error('Failed to load Google Sheets data.'));
-            }
-        });
+    if (isGoogleSheet) {
+        fetchData(localGsheetCSVURL, true, searchText)
+            .then(() => {
+                searchBox.addEventListener('input', handleSearchGoogleSheet);
+                return fetchData(googleSheetURL, true, searchText, false);
+            })
+            .then(() => {
+                populateTable(csvData, searchText, true);
+                console.log('Table updated with latest Google Sheets data.');
+            })
+            .catch(() => console.error('Failed to load Google Sheets data.'));
+    } else {
+        fetchData(localCSVURL, false, searchText)
+            .then(() => searchBox.addEventListener('input', handleSearchLocal))
+            .catch(() => console.error('Failed to load local CSV data.'));
+    }
 
     document.querySelector(`.data-source-btn[data-source="${initialSource}"]`).classList.add('active');
     searchBox.value = searchText;
