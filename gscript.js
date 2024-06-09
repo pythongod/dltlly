@@ -1,7 +1,6 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
 const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSTQCuvOmXn1mJTpP8Xsxs_hQGuGvKgWuvbb_ZwvuM2rCb0hBmNUOEKiyk25-hy5ljG-4tCuLqVwrRx/pub?gid=1245526804&single=true&output=csv';
-const localCSVURL = '/data/battle_events.csv';
 const localGsheetCSVURL = '/data/gsheet_battle_events.csv';
 
 // Function to parse CSV text into a 2D array
@@ -10,7 +9,7 @@ function parseCSV(text) {
 }
 
 // Function to populate the table with data
-function populateTable(data, searchText = '', showAdditionalColumns = false) {
+function populateTable(data, searchText = '') {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
     let count = 0; // Initialize a counter for the number of rows
@@ -37,11 +36,7 @@ function populateTable(data, searchText = '', showAdditionalColumns = false) {
                 td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
             }
 
-            if (showAdditionalColumns && (cellIndex === 10 || cellIndex === 11 || cellIndex === 12)) {
-                tr.appendChild(td);
-            } else if (cellIndex < 10) {
-                tr.appendChild(td);
-            }
+            tr.appendChild(td);
         });
         tableBody.appendChild(tr);
     });
@@ -78,17 +73,15 @@ function sortDataByViews(data, isAscending) {
 }
 
 // Function to search within the table
-function searchTable(data, searchText, showAdditionalColumns = false) {
+function searchTable(data, searchText) {
     const filteredData = data.filter((row, index) => {
         if (index === 0) return true;
-        return row.some((cell, cellIndex) => {
-            return cell.toLowerCase().includes(searchText.toLowerCase());
-        });
+        return row.some(cell => cell.toLowerCase().includes(searchText.toLowerCase()));
     });
     currentData = filteredData;
     const numResults = filteredData.length - 1;
     document.getElementById('search-results').textContent = `Search results: ${numResults}`;
-    populateTable(filteredData, searchText, showAdditionalColumns);
+    populateTable(filteredData, searchText);
 }
 
 // Function to get URL parameters
@@ -110,29 +103,29 @@ function toggleDarkMode(on) {
 }
 
 // Function to fetch data from a given URL and populate the table
-function fetchData(url, showAdditionalColumns = false, searchText = '', updateTable = true) {
+function fetchData(url, searchText = '') {
     return fetch(url)
         .then(response => response.text())
         .then(text => {
-            const data = parseCSV(text);
-            if (data.length > 1) {
-                csvData = data;
-                currentData = data;
-                if (updateTable) {
-                    if (searchText) {
-                        searchTable(data, searchText, showAdditionalColumns);
-                    } else {
-                        populateTable(data, '', showAdditionalColumns);
-                    }
-                }
+            csvData = parseCSV(text);
+            currentData = csvData;
+            if (searchText) {
+                searchTable(csvData, searchText);
             } else {
-                throw new Error('No data found');
+                populateTable(csvData, searchText);
             }
         })
-        .catch(error => {
-            console.error('Error fetching the CSV file:', error);
-            throw error;
-        });
+        .catch(error => console.error('Error fetching the CSV file:', error));
+}
+
+// Function to fetch the latest Google Sheet data
+function fetchOnlineData() {
+    fetchData(googleSheetURL)
+        .then(() => {
+            populateTable(csvData);
+            console.log('Table updated with latest Google Sheets data.');
+        })
+        .catch(error => console.error('Failed to load Google Sheets data.', error));
 }
 
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
@@ -153,7 +146,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 document.addEventListener('DOMContentLoaded', function() {
     const searchBox = document.getElementById('searchBox');
     const searchText = getUrlParameter('search') || '';
-    const initialSource = getUrlParameter('source') || 'local-csv';
 
     document.getElementById('sort-uploaded').addEventListener('click', () => {
         const sortedData = sortDataByUploaded(csvData);
@@ -172,61 +164,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     searchBox.addEventListener('input', () => {
-        const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
-        searchTable(csvData, searchBox.value, isGoogleSheet);
+        searchTable(csvData, searchBox.value);
     });
 
-    document.querySelectorAll('.data-source-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const source = this.getAttribute('data-source');
-            if (source === 'google-sheet') {
-                fetchData(localGsheetCSVURL, true, searchText)
-                    .then(() => {
-                        updateTableHeaders(true);
-                        return fetchData(googleSheetURL, true, searchText, false);
-                    })
-                    .then(() => {
-                        populateTable(csvData, searchText, true);
-                        console.log('Table updated with latest Google Sheets data.');
-                    })
-                    .catch(() => console.error('Failed to load Google Sheets data.'));
-            } else if (source === 'local-csv') {
-                fetchData(localCSVURL, false, searchText)
-                    .then(() => updateTableHeaders(false))
-                    .catch(() => console.error('Failed to load local CSV data.'));
-            }
-            document.querySelectorAll('.data-source-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        });
-    });
-
-    const handleSearchGoogleSheet = () => searchTable(csvData, searchBox.value, true);
-    const handleSearchLocal = () => searchTable(csvData, searchBox.value, false);
-
-    // Update table headers before fetching data
-    const isGoogleSheet = initialSource === 'google-sheet';
-    updateTableHeaders(isGoogleSheet);
-
-    // Initial fetch from the local CSV file or Google Sheet based on the default or URL parameter
-    if (isGoogleSheet) {
-        fetchData(localGsheetCSVURL, true, searchText)
-            .then(() => {
-                searchBox.addEventListener('input', handleSearchGoogleSheet);
-                return fetchData(googleSheetURL, true, searchText, false);
-            })
-            .then(() => {
-                populateTable(csvData, searchText, true);
-                console.log('Table updated with latest Google Sheets data.');
-            })
-            .catch(() => console.error('Failed to load Google Sheets data.'));
-    } else {
-        fetchData(localCSVURL, false, searchText)
-            .then(() => searchBox.addEventListener('input', handleSearchLocal))
-            .catch(() => console.error('Failed to load local CSV data.'));
-    }
-
-    document.querySelector(`.data-source-btn[data-source="${initialSource}"]`).classList.add('active');
-    searchBox.value = searchText;
+    // Initial fetch from the local Google Sheet CSV file
+    fetchData(localGsheetCSVURL, searchText);
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -247,24 +189,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
-    const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
-    searchTable(csvData, filter, isGoogleSheet);
-}
-
-// Function to update table headers based on the selected data source
-function updateTableHeaders(showAdditionalColumns) {
-    const thead = document.getElementById('data-table').getElementsByTagName('thead')[0];
-    thead.innerHTML = `
-        <tr>
-            <th>MC Name #1</th>
-            <th>MC Name #2</th>
-            <th>Event / Ort</th>
-            <th>Type</th>
-            <th>Year</th>
-            <th>League</th>
-            <th id="sort-uploaded">Uploaded</th>
-            <th>URL</th>
-            <th id="sort-views" title="Click to sort by views">Views</th>
-            ${showAdditionalColumns ? '<th>Location</th><th>Stadt</th><th>Event</th>' : ''}
-        </tr>`;
+    searchTable(csvData, filter);
 }
