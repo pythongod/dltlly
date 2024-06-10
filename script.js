@@ -256,7 +256,7 @@ function addYouTubeThumbnails() {
         link.addEventListener('mouseover', function() {
             const videoId = new URLSearchParams(new URL(link.href).search).get('v');
             if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
                 tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
             }
         });
