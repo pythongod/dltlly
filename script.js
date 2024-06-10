@@ -197,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(() => searchBox.addEventListener('input', handleSearchLocal))
         .catch(() => console.error('Failed to load local CSV data.'));
 
-    // document.querySelector(`.data-source-btn[data-source="${initialSource}"]`).classList.add('active');
     searchBox.value = searchText;
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
