@@ -212,6 +212,11 @@ body.dark-mode .footer-link {
     color: #bbbbff;
 }
 
+body.dark-mode footer {
+    background-color: #333;
+    color: #fff;
+}
+
 .theme-toggle-btn {
     cursor: pointer;
     font-size: 24px;
