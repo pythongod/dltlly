@@ -1,8 +1,6 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
-const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSTQCuvOmXn1mJTpP8Xsxs_hQGuGvKgWuvbb_ZwvuM2rCb0hBmNUOEKiyk25-hy5ljG-4tCuLqVwrRx/pub?gid=1245526804&single=true&output=csv';
 const localCSVURL = '/data/battle_events.csv';
-const localGsheetCSVURL = '/data/gsheet_battle_events.csv';
 
 // Function to parse CSV text into a 2D array
 function parseCSV(text) {
@@ -173,25 +171,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     searchBox.addEventListener('input', () => {
-        const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
-        searchTable(csvData, searchBox.value, isGoogleSheet);
+        searchTable(csvData, searchBox.value, false);
     });
 
     document.querySelectorAll('.data-source-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
-            if (source === 'google-sheet') {
-                fetchData(localGsheetCSVURL, true, searchText)
-                    .then(() => {
-                        updateTableHeaders(true);
-                        return fetchData(googleSheetURL, true, searchText, false);
-                    })
-                    .then(() => {
-                        populateTable(csvData, searchText, true);
-                        console.log('Table updated with latest Google Sheets data.');
-                    })
-                    .catch(() => console.error('Failed to load Google Sheets data.'));
-            } else if (source === 'local-csv') {
+            if (source === 'local-csv') {
                 fetchData(localCSVURL, false, searchText)
                     .then(() => updateTableHeaders(false))
                     .catch(() => console.error('Failed to load local CSV data.'));
@@ -201,30 +187,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    const handleSearchGoogleSheet = () => searchTable(csvData, searchBox.value, true);
     const handleSearchLocal = () => searchTable(csvData, searchBox.value, false);
 
     // Update table headers before fetching data
-    const isGoogleSheet = initialSource === 'google-sheet';
-    updateTableHeaders(isGoogleSheet);
+    updateTableHeaders(false);
 
-    // Initial fetch from the local CSV file or Google Sheet based on the default or URL parameter
-    if (isGoogleSheet) {
-        fetchData(localGsheetCSVURL, true, searchText)
-            .then(() => {
-                searchBox.addEventListener('input', handleSearchGoogleSheet);
-                return fetchData(googleSheetURL, true, searchText, false);
-            })
-            .then(() => {
-                populateTable(csvData, searchText, true);
-                console.log('Table updated with latest Google Sheets data.');
-            })
-            .catch(() => console.error('Failed to load Google Sheets data.'));
-    } else {
-        fetchData(localCSVURL, false, searchText)
-            .then(() => searchBox.addEventListener('input', handleSearchLocal))
-            .catch(() => console.error('Failed to load local CSV data.'));
-    }
+    // Initial fetch from the local CSV file based on the default or URL parameter
+    fetchData(localCSVURL, false, searchText)
+        .then(() => searchBox.addEventListener('input', handleSearchLocal))
+        .catch(() => console.error('Failed to load local CSV data.'));
 
     document.querySelector(`.data-source-btn[data-source="${initialSource}"]`).classList.add('active');
     searchBox.value = searchText;
@@ -269,8 +240,7 @@ function addYouTubeThumbnails() {
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
-    const isGoogleSheet = document.querySelector('.data-source-btn[data-source="google-sheet"]').classList.contains('active');
-    searchTable(csvData, filter, isGoogleSheet);
+    searchTable(csvData, filter, false);
 }
 
 // Function to update table headers based on the selected data source
@@ -287,6 +257,5 @@ function updateTableHeaders(showAdditionalColumns) {
             <th id="sort-uploaded">Uploaded</th>
             <th>URL</th>
             <th id="sort-views" title="Click to sort by views">Views</th>
-            ${showAdditionalColumns ? '<th>Location</th><th>Stadt</th><th>Event</th>' : ''}
         </tr>`;
 }
