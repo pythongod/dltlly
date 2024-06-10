@@ -254,7 +254,7 @@ body.dark-mode .footer-link {
     z-index: 1;
     bottom: 125%; /* Position the tooltip above the link */
     left: 50%;
-    margin-left: -100px; /* Center the tooltip */
+    margin-left: -640px; /* Center the tooltip */
     opacity: 0;
     transition: opacity 0.3s;
 }
