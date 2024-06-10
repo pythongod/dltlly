@@ -33,7 +33,7 @@ function populateTable(data, searchText = '') {
             if (cellIndex === 7) { // Correct this if the indices shift due to column removal
                 const URL = `${row[7]}`;
                 const URLtext = 'Link';
-                td.innerHTML = `<a href="${URL}" target="_blank">${URLtext}</a>`;
+                td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             }
 
             tr.appendChild(td);
