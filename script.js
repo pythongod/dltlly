@@ -8,7 +8,7 @@ function parseCSV(text) {
 }
 
 // Function to populate the table with data
-function populateTable(data, searchText = '', showAdditionalColumns = false) {
+function populateTable(data, searchText = '') {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
     let count = 0; // Initialize a counter for the number of rows
@@ -35,9 +35,7 @@ function populateTable(data, searchText = '', showAdditionalColumns = false) {
                 td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             }
 
-            if (showAdditionalColumns && (cellIndex === 10 || cellIndex === 11 || cellIndex === 12)) {
-                tr.appendChild(td);
-            } else if (cellIndex < 10) {
+            if (cellIndex < 10) {
                 tr.appendChild(td);
             }
         });
@@ -77,17 +75,15 @@ function sortDataByViews(data, isAscending) {
 }
 
 // Function to search within the table
-function searchTable(data, searchText, showAdditionalColumns = false) {
+function searchTable(data, searchText) {
     const filteredData = data.filter((row, index) => {
         if (index === 0) return true;
-        return row.some((cell, cellIndex) => {
-            return cell.toLowerCase().includes(searchText.toLowerCase());
-        });
+        return row.some((cell) => cell.toLowerCase().includes(searchText.toLowerCase()));
     });
     currentData = filteredData;
     const numResults = filteredData.length - 1;
     document.getElementById('search-results').textContent = `Search results: ${numResults}`;
-    populateTable(filteredData, searchText, showAdditionalColumns);
+    populateTable(filteredData, searchText);
 }
 
 // Function to get URL parameters
@@ -109,7 +105,7 @@ function toggleDarkMode(on) {
 }
 
 // Function to fetch data from a given URL and populate the table
-function fetchData(url, showAdditionalColumns = false, searchText = '', updateTable = true) {
+function fetchData(url, searchText = '', updateTable = true) {
     return fetch(url)
         .then(response => response.text())
         .then(text => {
@@ -119,9 +115,9 @@ function fetchData(url, showAdditionalColumns = false, searchText = '', updateTa
                 currentData = data;
                 if (updateTable) {
                     if (searchText) {
-                        searchTable(data, searchText, showAdditionalColumns);
+                        searchTable(data, searchText);
                     } else {
-                        populateTable(data, '', showAdditionalColumns);
+                        populateTable(data);
                     }
                 }
             } else {
@@ -171,15 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     searchBox.addEventListener('input', () => {
-        searchTable(csvData, searchBox.value, false);
+        searchTable(csvData, searchBox.value);
     });
 
     document.querySelectorAll('.data-source-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             if (source === 'local-csv') {
-                fetchData(localCSVURL, false, searchText)
-                    .then(() => updateTableHeaders(false))
+                fetchData(localCSVURL, searchText)
                     .catch(() => console.error('Failed to load local CSV data.'));
             }
             document.querySelectorAll('.data-source-btn').forEach(b => b.classList.remove('active'));
@@ -187,13 +182,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    const handleSearchLocal = () => searchTable(csvData, searchBox.value, false);
-
-    // Update table headers before fetching data
-    updateTableHeaders(false);
+    const handleSearchLocal = () => searchTable(csvData, searchBox.value);
 
     // Initial fetch from the local CSV file based on the default or URL parameter
-    fetchData(localCSVURL, false, searchText)
+    fetchData(localCSVURL, searchText)
         .then(() => searchBox.addEventListener('input', handleSearchLocal))
         .catch(() => console.error('Failed to load local CSV data.'));
 
@@ -239,22 +231,5 @@ function addYouTubeThumbnails() {
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
-    searchTable(csvData, filter, false);
-}
-
-// Function to update table headers based on the selected data source
-function updateTableHeaders(showAdditionalColumns) {
-    const thead = document.getElementById('data-table').getElementsByTagName('thead')[0];
-    thead.innerHTML = `
-        <tr>
-            <th>MC Name #1</th>
-            <th>MC Name #2</th>
-            <th>Event / Ort</th>
-            <th>Type</th>
-            <th>Year</th>
-            <th>League</th>
-            <th id="sort-uploaded">Uploaded</th>
-            <th>URL</th>
-            <th id="sort-views" title="Click to sort by views">Views</th>
-        </tr>`;
+    searchTable(csvData, filter);
 }
