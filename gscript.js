@@ -133,16 +133,7 @@ document.getElementById('dark-mode-toggle').addEventListener('click', function()
     localStorage.setItem("theme", isDarkMode ? "dark" : "light");
 });
 
-// Check local storage for theme preference and apply it
-document.addEventListener('DOMContentLoaded', (event) => {
-    // Retrieve the preferred theme from local storage
-    const preferredTheme = localStorage.getItem("theme");
-    
-    // Apply dark mode only if the stored theme is 'dark'
-    const isDarkMode = preferredTheme === "dark";
-    toggleDarkMode(isDarkMode);
-});
-
+// Combined DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
     const searchBox = document.getElementById('searchBox');
     const searchText = getUrlParameter('search') || '';
@@ -185,6 +176,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('last-updated').textContent += formattedDateTime;
         })
         .catch(error => console.error('Error fetching or parsing the YAML file:', error));
+
+    // Check local storage for theme preference and apply it
+    const preferredTheme = localStorage.getItem("theme");
+    const isDarkMode = preferredTheme === "dark";
+    toggleDarkMode(isDarkMode);
 });
 
 // Function to add YouTube thumbnails on hover
