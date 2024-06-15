@@ -15,4 +15,8 @@ https://jkl.ink/
 
 
 # Steps 
+## To-Do's
 
+- buttons for leagues only search in column league
+    - RAM serach vs RAM
+- change 
