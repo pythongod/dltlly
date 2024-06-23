@@ -50,7 +50,9 @@ function populateTable(data, searchText = '') {
         tableBody.appendChild(tr);
     });
     document.getElementById('search-results').textContent = `Search results: ${count}`;
-    addYouTubeThumbnails(); // Add YouTube thumbnails after populating the table
+    setTimeout(() => {
+        addYouTubeThumbnails();
+    }, 100);
 }
 
 // Function to sort data by uploaded date
