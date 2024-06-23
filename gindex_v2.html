@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rap Battle DB - Google Sheet</title>
+    <script defer data-domain="battledb.xyz" src="https://plausible.jkl.ink/js/script.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="gstyle_v2.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <div id="filters">
+            <button class="filter-btn" data-filter="DLTLLY">DLTLLY</button>
+            <button class="filter-btn" data-filter="DUDL">DUDL</button>
+            <button class="filter-btn" data-filter="SPOX">SPOX</button>
+            <button class="filter-btn" data-filter="FOB">FOB</button>
+            <button class="filter-btn" data-filter="RAM">RAM</button>
+            <button class="filter-btn" data-filter="🏆">🏆</button>
+            <button class="filter-btn" data-filter="On Beat">On Beat</button>
+            <button class="filter-btn" data-filter="">Reset</button>
+            <button id="dark-mode-toggle" class="filter-btn">Dark Mode</button>
+            <button class="data-source-btn" data-source="local-csv" onclick="window.location.href='index.html'">Simple Version</button>
+            <button class="data-source-btn" data-source="google-sheet" onclick="fetchOnlineData()">&#8635;</button>      
+            <button class="data-source-btn" data-source="local-csv" onclick="window.open('https://docs.google.com/spreadsheets/d/14yV_S0FgmiXFwilMlasA9kFDL1KRvb7SO3gHU6x2zxc/edit?usp=sharing','_blank')">GoTo GoogleSheet</button>    
+            <!-- Add more filters as needed -->
+        </div>
+        <input type="text" id="searchBox" placeholder="Search...">
+        <div class="info-container">
+            <div id="last-updated" class="info-text">Last updated: </div>
+            <div id="search-results" class="info-text">Search results: 0</div>
+        </div>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>MC Name #1</th>
+                    <th>MC Name #2</th>
+                    <th>Event</th>
+                    <th>Location</th>
+                    <th>Stadt</th>
+                    <th>Type</th>
+                    <th>Year</th>
+                    <th>League</th>
+                    <th id="sort-uploaded">Uploaded</th>
+                    <th>URL</th>
+                    <th id="sort-views" title="Click to sort by views">Views</th>                    
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data rows will be inserted here -->
+            </tbody>
+        </table>
+        <footer>
+            <div class="container">
+                <a href="subpage.html" class="footer-link">More Information</a>
+            </div>
+        </footer> 
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="gscript.js"></script>
+</body>
+</html>
