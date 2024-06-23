@@ -7,6 +7,7 @@ function parseCSV(text) {
     return text.split('\n').map(row => row.split(','));
 }
 
+// 0 Name #1, 1 Name #2,2 Event,3 Type, 4Year, 5 Channel, 6 Uploaded, 7 URL, 8 ID, 9 Views
 // Function to populate the table with data
 function populateTable(data, searchText = '') {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
