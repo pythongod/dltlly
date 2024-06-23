@@ -235,10 +235,6 @@ function addYouTubeThumbnails() {
     });
 }
 
-// Call the function when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', addYouTubeThumbnails);
-
-
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
     searchTable(csvData, filter);
