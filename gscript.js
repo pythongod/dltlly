@@ -195,66 +195,42 @@ function addYouTubeThumbnails() {
 
     youtubeLinks.forEach(link => {
         const tooltip = link.querySelector('.tooltiptext');
-        if (!tooltip) {
-            console.error('Tooltip element not found');
-            return;
-        }
 
-        const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-        if (!videoId) {
-            console.error('Video ID not found');
-            return;
-        }
+        link.addEventListener('mouseover', function() {
+            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+            if (videoId) {
+                const thumbnailQualities = [
+                    'maxresdefault.jpg',
+                    'sddefault.jpg',
+                    'hqdefault.jpg',
+                    'mqdefault.jpg',
+                    'default.jpg'
+                ];
 
-        const thumbnailQualities = [
-            'maxresdefault.jpg',
-            'sddefault.jpg',
-            'hqdefault.jpg',
-            'mqdefault.jpg',
-            'default.jpg'
-        ];
+                function tryNextThumbnail(index = 0) {
+                    if (index >= thumbnailQualities.length) {
+                        console.warn('No thumbnail found for video:', videoId);
+                        tooltip.innerHTML = 'Thumbnail not available';
+                        return;
+                    }
 
-        const img = document.createElement('img');
-        img.alt = "Video Thumbnail";
-        img.style.width = "100%";
-        img.style.height = "auto";
-        img.style.display = "none"; // Hide the image initially
+                    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${thumbnailQualities[index]}`;
+                    const img = new Image();
+                    img.onload = function() {
+                        tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
+                    };
+                    img.onerror = function() {
+                        tryNextThumbnail(index + 1);
+                    };
+                    img.src = thumbnailUrl;
+                }
 
-        // Create and add a loading indicator
-        const loadingIndicator = document.createElement('div');
-        loadingIndicator.textContent = "Loading thumbnail...";
-        loadingIndicator.style.textAlign = "center";
-        tooltip.appendChild(loadingIndicator);
-
-        function tryNextThumbnail(index = 0) {
-            if (index >= thumbnailQualities.length) {
-                console.error('No thumbnail found for video:', videoId);
-                img.src = 'path/to/fallback-image.jpg'; // Replace with a path to a default image
-                loadingIndicator.remove();
-                img.style.display = "block";
-                return;
+                tryNextThumbnail();
             }
-
-            img.src = `https://img.youtube.com/vi/${videoId}/${thumbnailQualities[index]}`;
-            img.onload = () => {
-                loadingIndicator.remove();
-                img.style.display = "block";
-            };
-            img.onerror = () => tryNextThumbnail(index + 1);
-        }
-
-        tryNextThumbnail();
-
-        tooltip.appendChild(img);
-
-        link.addEventListener('mouseenter', () => {
-            tooltip.style.visibility = 'visible';
-            tooltip.style.opacity = '1';
         });
 
-        link.addEventListener('mouseleave', () => {
-            tooltip.style.visibility = 'hidden';
-            tooltip.style.opacity = '0';
+        link.addEventListener('mouseleave', function() {
+            tooltip.innerHTML = ''; // Clear the tooltip content
         });
     });
 }
