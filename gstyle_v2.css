@@ -109,6 +109,7 @@ input#searchBox {
     position: relative;
     overflow: hidden;
     text-overflow: ellipsis;
+    word-wrap: normal;
 }
 
 #data-table td:hover {
