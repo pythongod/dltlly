@@ -19,7 +19,7 @@ function populateTable(data, searchText = '') {
         const tr = document.createElement('tr');
         row.forEach((cell, cellIndex) => {
             if (cellIndex === 8) return; // Skip the ID column
-            if (cellIndex === 3) return; // event location
+            if (cellIndex === 2) return; // event location
 
             const td = document.createElement('td');
 
