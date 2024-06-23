@@ -81,64 +81,131 @@ input#searchBox {
 
 #data-table {
     width: 100%;
-    table-layout: fixed; /* This ensures that the column widths are respected */
+    table-layout: fixed;
     border-collapse: collapse;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Set widths for specific columns */
-#data-table th:nth-child(1), #data-table td:nth-child(1) { width: 15%; } /* MC Name #1 */
-#data-table th:nth-child(2), #data-table td:nth-child(2) { width: 15%; } /* MC Name #2 */
-#data-table th:nth-child(3), #data-table td:nth-child(3) { width: 10%; } /* Event */
-#data-table th:nth-child(4), #data-table td:nth-child(4) { width: 10%; } /* Location */
-#data-table th:nth-child(5), #data-table td:nth-child(5) { width: 7.5%; } /* Stadt */
-#data-table th:nth-child(6), #data-table td:nth-child(6) { width: 7.5%; } /* Type */
-#data-table th:nth-child(7), #data-table td:nth-child(7) { width: 5%; } /* Year */
-#data-table th:nth-child(8), #data-table td:nth-child(8) { width: 5%; } /* League */
-#data-table th:nth-child(9), #data-table td:nth-child(9) { width: 7.5%; } /* Uploaded */
-#data-table th:nth-child(10), #data-table td:nth-child(10) { width: 5%; } /* URL */
-#data-table th:nth-child(11), #data-table td:nth-child(11) { width: 7.5%; } /* Views */
+#data-table th:nth-child(1), #data-table td:nth-child(1) { width: 15%; }
+#data-table th:nth-child(2), #data-table td:nth-child(2) { width: 15%; }
+#data-table th:nth-child(3), #data-table td:nth-child(3) { width: 10%; }
+#data-table th:nth-child(4), #data-table td:nth-child(4) { width: 10%; }
+#data-table th:nth-child(5), #data-table td:nth-child(5) { width: 7.5%; }
+#data-table th:nth-child(6), #data-table td:nth-child(6) { width: 7.5%; }
+#data-table th:nth-child(7), #data-table td:nth-child(7) { width: 5%; }
+#data-table th:nth-child(8), #data-table td:nth-child(8) { width: 5%; }
+#data-table th:nth-child(9), #data-table td:nth-child(9) { width: 7.5%; }
+#data-table th:nth-child(10), #data-table td:nth-child(10) { width: 5%; }
+#data-table th:nth-child(11), #data-table td:nth-child(11) { width: 7.5%; }
 
-/* Ensure content doesn't overflow */
 #data-table th, #data-table td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Add hover effect to see full content */
+#data-table td {
+    position: relative;
+    overflow: visible;
+}
+
 #data-table td:hover {
     white-space: normal;
     word-wrap: break-word;
 }
 
-#data-table td {
+#data-table td a {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+}
+
+.tooltip {
+    position: static;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 320px;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 5px;
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    pointer-events: none;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip .tooltiptext::before {
+    content: '';
+    display: block;
+    height: 10px;
+}
+
+.tooltip .tooltiptext img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+#data-table tr:nth-child(-n+3) .tooltip .tooltiptext {
+    bottom: auto;
+    top: 100%;
+}
+
+#sort-views {
+    cursor: pointer;
     position: relative;
 }
 
-@media screen and (max-width: 600px) {
-    #data-table {
-        table-layout: auto; /* Allow table to adjust for small screens */
-    }
-    
-    #data-table th, #data-table td {
-        width: auto !important; /* Override fixed widths on small screens */
-    }
+#sort-views:hover {
+    background-color: #e0e0e0;
 }
 
-@media screen and (max-width: 600px) {
-    #data-table {
-        width: 100%;
-        display: block;
-        overflow-x: auto;
-    }
+#sort-views.asc:after {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid black;
+    transform: translateY(-50%);
+}
 
-    th, td {
-        white-space: nowrap;
-    }
+#sort-views.desc:after {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid black;
+    transform: translateY(-50%);
 }
 
 footer {
@@ -157,37 +224,12 @@ footer {
     text-decoration: underline;
 }
 
-#sort-views {
+.theme-toggle-btn {
     cursor: pointer;
-    position: relative;
-}
-
-#sort-views:hover {
-    background-color: #e0e0e0;
-}
-
-/* Triangle pointing downwards (for ascending sort) */
-#sort-views.asc:after {
-    content: '';
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid black;
-    transform: translateY(-50%);
-}
-
-/* Triangle pointing upwards (for descending sort) */
-#sort-views.desc:after {
-    content: '';
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid black;
-    transform: translateY(-50%);
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: inherit;
 }
 
 /* Dark Mode Styles */
@@ -240,63 +282,20 @@ body.dark-mode footer {
     color: #fff;
 }
 
-.theme-toggle-btn {
-    cursor: pointer;
-    font-size: 24px;
-    background: none;
-    border: none;
-    color: inherit;
-}
-
-.dark-mode a {
+body.dark-mode a {
     color: #a9ecf5;
     text-decoration: underline;
     text-decoration-style: dotted;
     border-bottom: none;
 }
 
-.dark-mode a:hover, .dark-mode a:focus {
+body.dark-mode a:hover, body.dark-mode a:focus {
     color: #ffffff;
     background-color: #555555;
 }
 
-.dark-mode a:visited {
+body.dark-mode a:visited {
     color: #c7a2ff;
-}
-
-.tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 320px; /* Increased width */
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #ddd;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1000;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -160px; /* Half of the width */
-    opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
-.tooltip .tooltiptext img {
-    max-width: 100%;
-    height: auto;
-    display: block;
 }
 
 body.dark-mode .tooltip .tooltiptext {
@@ -305,9 +304,21 @@ body.dark-mode .tooltip .tooltiptext {
     border-color: #555;
 }
 
-#data-table td a {
-    white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
-    max-width: none;
+@media screen and (max-width: 600px) {
+    #data-table {
+        table-layout: auto;
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+    }
+    
+    #data-table th, #data-table td {
+        width: auto !important;
+        white-space: nowrap;
+    }
+    
+    .tooltip .tooltiptext {
+        width: 200px;
+        margin-left: -100px;
+    }
 }
