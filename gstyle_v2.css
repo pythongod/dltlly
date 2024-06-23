@@ -159,7 +159,7 @@ input#searchBox {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 320px;
+    width: 640px;
     background-color: #fff;
     color: #000;
     border: 1px solid #ddd;
