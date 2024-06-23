@@ -221,9 +221,3 @@ function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
     searchTable(csvData, filter);
 }
-
-
-// Call this function after the table is populated
-document.addEventListener('DOMContentLoaded', function() {
-    addYouTubeThumbnails();
-});
