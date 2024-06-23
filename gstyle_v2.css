@@ -276,12 +276,13 @@ body.dark-mode footer {
     border-radius: 6px;
     padding: 5px;
     position: absolute;
-    z-index: 1;
-    bottom: 125%;
+    z-index: 1000; /* Increase z-index */
+    bottom: 100%; /* Change from 125% to 100% */
     left: 50%;
-    margin-left: -160px;
+    transform: translateX(-50%); /* Center the tooltip */
+    margin-bottom: 5px; /* Add some space between tooltip and link */
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, visibility 0.3s;
 }
 
 .tooltip:hover .tooltiptext {
@@ -292,7 +293,7 @@ body.dark-mode footer {
 .tooltip .tooltiptext img {
     max-width: 100%;
     height: auto;
-    display: flex;
+    display: block;
 }
 
 body.dark-mode .tooltip .tooltiptext {
@@ -302,9 +303,8 @@ body.dark-mode .tooltip .tooltiptext {
 }
 
 #data-table td a {
-    background-color: yellow !important;
-    overflow: visible !important;
-    white-space: normal !important;
-    width: auto !important;
-    display: inline-block !important;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
 }
