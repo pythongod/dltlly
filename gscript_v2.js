@@ -52,7 +52,7 @@ function populateTable(data, searchText = '') {
     document.getElementById('search-results').textContent = `Search results: ${count}`;
     setTimeout(() => {
         addYouTubeThumbnails();
-    }, 100);
+    }, 10);
 }
 
 // Function to sort data by uploaded date
