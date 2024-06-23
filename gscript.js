@@ -198,20 +198,24 @@ function addYouTubeThumbnails() {
 
         link.addEventListener('mouseover', function() {
             if (tooltip.innerHTML !== '') return; // Skip if thumbnail is already loaded
-
-            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-            if (videoId) {
-                // Try loading maxresdefault first
-                loadThumbnail(videoId, 'maxresdefault', tooltip, () => {
-                    // If maxresdefault fails, try mqdefault
-                    loadThumbnail(videoId, 'mqdefault', tooltip, () => {
-                        tooltip.innerHTML = 'Thumbnail not available';
+        
+            try {
+                const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+                if (videoId) {
+                    // Try loading maxresdefault first
+                    loadThumbnail(videoId, 'maxresdefault', tooltip, () => {
+                        // If maxresdefault fails, try mqdefault
+                        loadThumbnail(videoId, 'mqdefault', tooltip, () => {
+                            tooltip.innerHTML = 'Thumbnail not available';
+                        });
                     });
-                });
-            } else {
-                tooltip.innerHTML = 'Not a valid YouTube URL';
+                } else {
+                    tooltip.innerHTML = 'Not a valid YouTube URL';
+                }
+            } catch (error) {
+                tooltip.innerHTML = 'Invalid URL';
             }
-        });
+        });        
     });
 }
 
