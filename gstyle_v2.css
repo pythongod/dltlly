@@ -105,23 +105,36 @@ input#searchBox {
     display: none;
 }
 
-#data-table td {
-    position: relative;
+/* General cell styling */
+#data-table td, #data-table th {
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    word-wrap: normal;
+    max-width: 0; /* This forces the cell to respect its width */
 }
 
+/* Hover effect for cells */
 #data-table td:hover {
-    overflow: visible;
     white-space: normal;
-    word-wrap: break-word;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
 }
 
-/* Ensure link cells (URL column) always show full content */
+/* Specific styling for Name columns to ensure they truncate properly */
+#data-table td:nth-child(1), #data-table td:nth-child(2) {
+    max-width: 150px; /* Adjust this value as needed */
+}
+
+/* Ensure the URL column doesn't truncate */
 #data-table td:nth-child(10) {
-    overflow: visible;
     white-space: nowrap;
+    overflow: visible;
+}
+
+/* Add a transition for smooth expansion */
+#data-table td {
+    transition: all 0.3s ease;
 }
 
 #data-table th, #data-table td {
