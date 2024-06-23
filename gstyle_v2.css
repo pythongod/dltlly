@@ -268,21 +268,8 @@ body.dark-mode footer {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 320px;
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #ddd;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1000; /* Increase z-index */
-    bottom: 100%; /* Change from 125% to 100% */
-    left: 50%;
-    transform: translateX(-50%); /* Center the tooltip */
-    margin-bottom: 5px; /* Add some space between tooltip and link */
     opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
+    transition: opacity 0.3s;
 }
 
 .tooltip:hover .tooltiptext {
