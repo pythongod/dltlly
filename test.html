@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Tooltip Test</title>
     <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 320px;
@@ -49,21 +55,26 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.tooltip').addEventListener('mouseenter', function() {
+            const link = document.querySelector('.tooltip');
+            link.addEventListener('mouseenter', function() {
                 const videoId = new URLSearchParams(new URL(this.href).search).get('v');
+                console.log('Video ID:', videoId); // Log the video ID
                 const tooltip = this.querySelector('.tooltiptext');
                 const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                console.log('Thumbnail URL:', thumbnailUrl); // Log the thumbnail URL
                 const img = new Image();
                 img.onload = function() {
+                    console.log('Thumbnail loaded'); // Log thumbnail load
                     tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
                 };
                 img.onerror = function() {
+                    console.log('Thumbnail load failed'); // Log thumbnail load failure
                     tooltip.innerHTML = 'Thumbnail not available';
                 };
                 img.src = thumbnailUrl;
             });
 
-            document.querySelector('.tooltip').addEventListener('mouseleave', function() {
+            link.addEventListener('mouseleave', function() {
                 this.querySelector('.tooltiptext').innerHTML = ''; // Clear the tooltip content
             });
         });
