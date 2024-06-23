@@ -31,9 +31,9 @@ function populateTable(data, searchText = '') {
             }
 
             // Special handling for URL column
-            if (cellIndex === 7) {
+            if (cellIndex === 7) { // URL column
                 const URLtext = 'Link';
-                td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+                td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<span class="tooltiptext"></span></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
                 td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
             } else {
@@ -191,21 +191,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
-    const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
+    const youtubeLinks = document.querySelectorAll('#data-table td:nth-child(10) a.tooltip');
 
     youtubeLinks.forEach(link => {
         const tooltip = link.querySelector('.tooltiptext');
 
         link.addEventListener('mouseover', function() {
+            if (tooltip.innerHTML !== '') return; // Skip if thumbnail is already loaded
+
             const videoId = new URLSearchParams(new URL(link.href).search).get('v');
             if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                const img = new Image();
+                img.onload = function() {
+                    tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail">`;
+                };
+                img.onerror = function() {
+                    tooltip.innerHTML = 'Thumbnail not available';
+                };
+                img.src = thumbnailUrl;
             }
-        });
-
-        link.addEventListener('mouseleave', function() {
-            tooltip.innerHTML = ''; // Clear the tooltip content
         });
     });
 }
