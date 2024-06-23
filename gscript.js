@@ -17,28 +17,32 @@ function populateTable(data, searchText = '') {
         if (index === 0) return; // Skip header row
         count++; // Increment count for each row
         const tr = document.createElement('tr');
-        row.forEach((cell, cellIndex) => {
-            if (cellIndex === 8) return; // Skip the ID column
-            if (cellIndex === 2) return; // event location
-
+        
+        // Define the order of columns we want
+        const columnOrder = [0, 1, 12, 10, 11, 3, 4, 5, 6, 7, 9];
+        
+        columnOrder.forEach(cellIndex => {
             const td = document.createElement('td');
+            let cellContent = row[cellIndex];
 
-            if (cellIndex === 9) { // Correct this to match the 'Views' column if indices changed
-                td.textContent = parseInt(cell).toLocaleString();
-            } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
-                td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-            } else {
-                td.textContent = cell;
+            // Special handling for Views column
+            if (cellIndex === 9) {
+                cellContent = parseInt(cellContent).toLocaleString();
             }
 
-            if (cellIndex === 7) { // Correct this if the indices shift due to column removal
-                const URL = `${row[7]}`;
+            // Special handling for URL column
+            if (cellIndex === 7) {
                 const URLtext = 'Link';
-                td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+                td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+            } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
+                td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+            } else {
+                td.textContent = cellContent;
             }
 
             tr.appendChild(td);
         });
+
         tableBody.appendChild(tr);
     });
     document.getElementById('search-results').textContent = `Search results: ${count}`;
