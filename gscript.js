@@ -201,18 +201,28 @@ function addYouTubeThumbnails() {
 
             const videoId = new URLSearchParams(new URL(link.href).search).get('v');
             if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                const img = new Image();
-                img.onload = function() {
-                    tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail">`;
-                };
-                img.onerror = function() {
-                    tooltip.innerHTML = 'Thumbnail not available';
-                };
-                img.src = thumbnailUrl;
+                // Try loading maxresdefault first
+                loadThumbnail(videoId, 'maxresdefault', tooltip, () => {
+                    // If maxresdefault fails, try mqdefault
+                    loadThumbnail(videoId, 'mqdefault', tooltip, () => {
+                        tooltip.innerHTML = 'Thumbnail not available';
+                    });
+                });
+            } else {
+                tooltip.innerHTML = 'Not a valid YouTube URL';
             }
         });
     });
+}
+
+function loadThumbnail(videoId, quality, tooltip, onError) {
+    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
+    const img = new Image();
+    img.onload = function() {
+        tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail">`;
+    };
+    img.onerror = onError;
+    img.src = thumbnailUrl;
 }
 
 function applyFilter(filter) {
