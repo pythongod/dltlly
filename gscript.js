@@ -206,12 +206,44 @@ function addYouTubeThumbnails() {
             return;
         }
 
-        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        const thumbnailQualities = [
+            'maxresdefault.jpg',
+            'sddefault.jpg',
+            'hqdefault.jpg',
+            'mqdefault.jpg',
+            'default.jpg'
+        ];
+
         const img = document.createElement('img');
-        img.src = thumbnailUrl;
         img.alt = "Video Thumbnail";
         img.style.width = "100%";
         img.style.height = "auto";
+        img.style.display = "none"; // Hide the image initially
+
+        // Create and add a loading indicator
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.textContent = "Loading thumbnail...";
+        loadingIndicator.style.textAlign = "center";
+        tooltip.appendChild(loadingIndicator);
+
+        function tryNextThumbnail(index = 0) {
+            if (index >= thumbnailQualities.length) {
+                console.error('No thumbnail found for video:', videoId);
+                img.src = 'path/to/fallback-image.jpg'; // Replace with a path to a default image
+                loadingIndicator.remove();
+                img.style.display = "block";
+                return;
+            }
+
+            img.src = `https://img.youtube.com/vi/${videoId}/${thumbnailQualities[index]}`;
+            img.onload = () => {
+                loadingIndicator.remove();
+                img.style.display = "block";
+            };
+            img.onerror = () => tryNextThumbnail(index + 1);
+        }
+
+        tryNextThumbnail();
 
         tooltip.appendChild(img);
 
