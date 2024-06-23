@@ -31,7 +31,7 @@ function populateTable(data, searchText = '') {
             }
 
             // Special handling for URL column
-            if (cellIndex === 10) {
+            if (cellIndex === 7) {
                 const URLtext = 'Link';
                 td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
