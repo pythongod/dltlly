@@ -89,14 +89,16 @@ input#searchBox {
 /* Set widths for specific columns */
 #data-table th:nth-child(1), #data-table td:nth-child(1) { width: 15%; } /* MC Name #1 */
 #data-table th:nth-child(2), #data-table td:nth-child(2) { width: 15%; } /* MC Name #2 */
-#data-table th:nth-child(3), #data-table td:nth-child(3) { width: 20%; } /* Event / Ort */
-#data-table th:nth-child(4), #data-table td:nth-child(4) { width: 10%; } /* Type */
+/* #data-table th:nth-child(3), #data-table td:nth-child(3) { width: 15%; } */ /* Event / Ort */
+#data-table th:nth-child(4), #data-table td:nth-child(4) { width: 5%; } /* Type */
 #data-table th:nth-child(5), #data-table td:nth-child(5) { width: 5%; } /* Year */
 #data-table th:nth-child(6), #data-table td:nth-child(6) { width: 5%; } /* League */
 #data-table th:nth-child(7), #data-table td:nth-child(7) { width: 10%; } /* Uploaded */
 #data-table th:nth-child(8), #data-table td:nth-child(8) { width: 5%; } /* URL */
 #data-table th:nth-child(9), #data-table td:nth-child(9) { width: 5%; } /* Views */
 #data-table th:nth-child(10), #data-table td:nth-child(10) { width: 10%; } /* Location */
+#data-table th:nth-child(11), #data-table td:nth-child(11) { width: 5%; } /* Stadt */
+#data-table th:nth-child(12), #data-table td:nth-child(12) { width: 5%; } /* Event */
 
 /* Ensure content doesn't overflow */
 #data-table th, #data-table td {
