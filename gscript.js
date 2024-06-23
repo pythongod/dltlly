@@ -183,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to add YouTube thumbnails on hover
-// Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
     document.querySelector('#data-table').addEventListener('mouseover', function(event) {
         const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
@@ -191,12 +190,13 @@ function addYouTubeThumbnails() {
 
         const tooltip = link.querySelector('.tooltiptext');
         if (!tooltip) {
-            console.error('Tooltip element not found or incorrect');
+            console.error('Tooltip element not found or incorrect for link:', link);
             return;
         }
 
         link.addEventListener('mouseenter', function() {
             const videoId = new URLSearchParams(new URL(this.href).search).get('v');
+            console.log('Video ID:', videoId); // Log the video ID
             if (videoId) {
                 const thumbnailQualities = [
                     'maxresdefault.jpg',
@@ -216,6 +216,7 @@ function addYouTubeThumbnails() {
                     }
 
                     const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${thumbnailQualities[index]}`;
+                    console.log('Trying thumbnail URL:', thumbnailUrl); // Log the URL
                     const img = new Image();
                     img.onload = function() {
                         tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
