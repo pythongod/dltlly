@@ -198,13 +198,13 @@ function addYouTubeThumbnails() {
 
         link.addEventListener('mouseover', function() {
             if (tooltip.innerHTML !== '') return; // Skip if thumbnail is already loaded
-        
+
             try {
                 const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+                console.log('Hover event on link:', link.href); // Log the hover event
+                console.log('Extracted Video ID:', videoId); // Log the extracted video ID
                 if (videoId) {
-                    // Try loading maxresdefault first
                     loadThumbnail(videoId, 'maxresdefault', tooltip, () => {
-                        // If maxresdefault fails, try mqdefault
                         loadThumbnail(videoId, 'mqdefault', tooltip, () => {
                             tooltip.innerHTML = 'Thumbnail not available';
                         });
@@ -214,20 +214,27 @@ function addYouTubeThumbnails() {
                 }
             } catch (error) {
                 tooltip.innerHTML = 'Invalid URL';
+                console.error('Error parsing URL:', error); // Log any URL parsing errors
             }
-        });        
+        });
     });
 }
 
 function loadThumbnail(videoId, quality, tooltip, onError) {
     const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
+    console.log('Attempting to load thumbnail:', thumbnailUrl); // Log the thumbnail URL
     const img = new Image();
     img.onload = function() {
+        console.log('Thumbnail loaded successfully:', thumbnailUrl); // Log successful load
         tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail">`;
     };
-    img.onerror = onError;
+    img.onerror = function() {
+        console.error('Failed to load thumbnail:', thumbnailUrl); // Log failed load
+        onError();
+    };
     img.src = thumbnailUrl;
 }
+
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
