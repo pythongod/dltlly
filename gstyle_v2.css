@@ -123,7 +123,7 @@ input#searchBox {
     overflow: visible;
     position: relative;
     z-index: 1;
-    background-color: #3b3b3b; /* Light background on hover for visibility */
+    background-color: #f8f8f8; /* Light background on hover for visibility */
 }
 
 /* Specific styling for Name columns */
