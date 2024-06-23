@@ -190,33 +190,46 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to add YouTube thumbnails on hover
-// Improved implementation
 function addYouTubeThumbnails() {
     const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
 
     youtubeLinks.forEach(link => {
         const tooltip = link.querySelector('.tooltiptext');
-        let thumbnailImg = null;
+        if (!tooltip) {
+            console.error('Tooltip element not found');
+            return;
+        }
 
-        link.addEventListener('mouseover', function() {
-            if (!thumbnailImg) {
-                const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-                if (videoId) {
-                    thumbnailImg = document.createElement('img');
-                    thumbnailImg.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                    thumbnailImg.alt = "Thumbnail";
-                    thumbnailImg.style.width = "100%";
-                    tooltip.appendChild(thumbnailImg);
-                }
-            }
-            tooltip.style.display = 'block';
+        const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+        if (!videoId) {
+            console.error('Video ID not found');
+            return;
+        }
+
+        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        const img = document.createElement('img');
+        img.src = thumbnailUrl;
+        img.alt = "Video Thumbnail";
+        img.style.width = "100%";
+        img.style.height = "auto";
+
+        tooltip.appendChild(img);
+
+        link.addEventListener('mouseenter', () => {
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
         });
 
-        link.addEventListener('mouseleave', function() {
-            tooltip.style.display = 'none';
+        link.addEventListener('mouseleave', () => {
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.opacity = '0';
         });
     });
 }
+
+// Call the function when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', addYouTubeThumbnails);
+
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
