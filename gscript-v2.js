@@ -33,6 +33,7 @@ function populateTable(data, searchText = '') {
 
             // Special handling for URL column
             if (cellIndex === 9) {
+                console.log("Setting URL link:", cellContent);
                 const URLtext = 'Link123';
                 td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
