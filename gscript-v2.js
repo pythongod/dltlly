@@ -26,12 +26,12 @@ function populateTable(data, searchText = '') {
             let cellContent = row[cellIndex];
 
             // Special handling for Views column
-            if (cellIndex === 10) {
+            if (cellIndex === 11) {
                 cellContent = parseInt(cellContent).toLocaleString();
             }
 
             // Special handling for URL column
-            if (cellIndex === 9) {
+            if (cellIndex === 10) {
                 const URLtext = 'Link';
                 td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
