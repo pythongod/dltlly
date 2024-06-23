@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to add YouTube thumbnails on hover
+// Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
     document.querySelector('#data-table').addEventListener('mouseover', function(event) {
         const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
@@ -234,6 +235,11 @@ function addYouTubeThumbnails() {
         });
     });
 }
+
+// Call this function after the table is populated
+document.addEventListener('DOMContentLoaded', function() {
+    addYouTubeThumbnails();
+});
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
