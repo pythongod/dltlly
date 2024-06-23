@@ -52,12 +52,12 @@ function populateTable(data, searchText = '') {
 // Function to sort data by uploaded date
 function sortDataByUploaded(data) {
     return data.slice(1).sort((a, b) => {
-        if (!a[6] || !b[6]) {
-            return !a[6] ? 1 : -1;
+        if (!a[8] || !b[8]) {
+            return !a[8] ? 1 : -1;
         }
         const datePattern = /(\d{4}-\d{1,2}-\d{1,2})/;
-        const dateStringA = (a[6].match(datePattern) || [])[1];
-        const dateStringB = (b[6].match(datePattern) || [])[1];
+        const dateStringA = (a[8].match(datePattern) || [])[1];
+        const dateStringB = (b[8].match(datePattern) || [])[1];
         const dateA = dateStringA ? new Date(dateStringA) : new Date(0);
         const dateB = dateStringB ? new Date(dateStringB) : new Date(0);
         return dateB - dateA;
@@ -67,8 +67,8 @@ function sortDataByUploaded(data) {
 // Function to sort data by views
 function sortDataByViews(data, isAscending) {
     return data.slice(1).sort((a, b) => {
-        const viewsA = parseInt(a[9]);
-        const viewsB = parseInt(b[9]);
+        const viewsA = parseInt(a[10]);
+        const viewsB = parseInt(b[10]);
 
         return isAscending ? viewsA - viewsB : viewsB - viewsA; // For ascending or descending order
     });
