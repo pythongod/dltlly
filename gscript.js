@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
-    const youtubeLinks = document.querySelectorAll('#data-table td:nth-child(10) a.tooltip');
+    const youtubeLinks = document.querySelectorAll('#data-table td:nth-child(8) a.tooltip');
 
     youtubeLinks.forEach(link => {
         const tooltip = link.querySelector('.tooltiptext');
@@ -199,23 +199,24 @@ function addYouTubeThumbnails() {
         link.addEventListener('mouseover', function() {
             if (tooltip.innerHTML !== '') return; // Skip if thumbnail is already loaded
 
-            try {
-                const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-                console.log('Hover event on link:', link.href); // Log the hover event
-                console.log('Extracted Video ID:', videoId); // Log the extracted video ID
-                if (videoId) {
-                    loadThumbnail(videoId, 'maxresdefault', tooltip, () => {
-                        loadThumbnail(videoId, 'mqdefault', tooltip, () => {
-                            tooltip.innerHTML = 'Thumbnail not available';
-                        });
-                    });
-                } else {
-                    tooltip.innerHTML = 'Not a valid YouTube URL';
-                }
-            } catch (error) {
-                tooltip.innerHTML = 'Invalid URL';
-                console.error('Error parsing URL:', error); // Log any URL parsing errors
+            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+            if (videoId) {
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                const img = new Image();
+                img.onload = function() {
+                    tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
+                };
+                img.onerror = function() {
+                    tooltip.innerHTML = 'Thumbnail not available';
+                };
+                img.src = thumbnailUrl;
+            } else {
+                tooltip.innerHTML = 'Not a valid YouTube URL';
             }
+        });
+
+        link.addEventListener('mouseleave', function() {
+            tooltip.innerHTML = ''; // Clear the tooltip content
         });
     });
 }
