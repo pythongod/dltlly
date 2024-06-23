@@ -292,7 +292,7 @@ body.dark-mode footer {
 .tooltip .tooltiptext img {
     max-width: 100%;
     height: auto;
-    display: block;
+    display: flex;
 }
 
 body.dark-mode .tooltip .tooltiptext {
