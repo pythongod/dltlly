@@ -1,6 +1,6 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
-const googleSheetURL = 'https://docs.google.com/spreadsheets/d/1Bi3UKWBt45cCUnTKHLlh5MhIFmF7D6F-TvggV0DyHlw/edit?gid=1245526804#gid=1245526804&single=true&output=csv';
+const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSTQCuvOmXn1mJTpP8Xsxs_hQGuGvKgWuvbb_ZwvuM2rCb0hBmNUOEKiyk25-hy5ljG-4tCuLqVwrRx/pub?gid=1245526804&single=true&output=csv';
 const localGsheetCSVURL = '/data/gsheet_battle_events.csv';
 
 // Function to parse CSV text into a 2D array
@@ -18,20 +18,19 @@ function populateTable(data, searchText = '') {
         const tr = document.createElement('tr');
         
         // Define the order of columns we want
-        // 0 Name #1	1 Name #2	2 Event	3 Location	4 Stadt	5 Type	6 Year	7 Channel	8 Uploaded	9 URL	10 Views 11 ID 12 hidden
-        const columnOrder = [0, 1, 2, 3, 4, 5, 5, 7, 8, 9, 10];
+        const columnOrder = [0, 1, 12, 10, 11, 3, 4, 5, 6, 7, 9];
         
         columnOrder.forEach(cellIndex => {
             const td = document.createElement('td');
             let cellContent = row[cellIndex];
 
             // Special handling for Views column
-            if (cellIndex === 10) {
+            if (cellIndex === 9) {
                 cellContent = parseInt(cellContent).toLocaleString();
             }
 
             // Special handling for URL column
-            if (cellIndex === 9) {
+            if (cellIndex === 7) {
                 const URLtext = 'Link';
                 td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
