@@ -8,7 +8,6 @@ function parseCSV(text) {
     return text.split('\n').map(row => row.split(','));
 }
 
-// Function to populate the table with data
 function populateTable(data, searchText = '') {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
@@ -197,42 +196,22 @@ function addYouTubeThumbnails() {
         link.addEventListener('mouseenter', function() {
             const videoId = new URLSearchParams(new URL(this.href).search).get('v');
             console.log('Video ID:', videoId); // Log the video ID
-            if (videoId) {
-                const thumbnailQualities = [
-                    'maxresdefault.jpg',
-                    'sddefault.jpg',
-                    'hqdefault.jpg',
-                    'mqdefault.jpg',
-                    'default.jpg'
-                ];
-
-                tooltip.innerHTML = '<div class="loading">Loading thumbnail...</div>';
-
-                function tryNextThumbnail(index = 0) {
-                    if (index >= thumbnailQualities.length) {
-                        console.warn('No thumbnail found for video:', videoId);
-                        tooltip.innerHTML = 'Thumbnail not available';
-                        return;
-                    }
-
-                    const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${thumbnailQualities[index]}`;
-                    console.log('Trying thumbnail URL:', thumbnailUrl); // Log the URL
-                    const img = new Image();
-                    img.onload = function() {
-                        tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
-                    };
-                    img.onerror = function() {
-                        tryNextThumbnail(index + 1);
-                    };
-                    img.src = thumbnailUrl;
-                }
-
-                tryNextThumbnail();
-            }
+            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+            console.log('Thumbnail URL:', thumbnailUrl); // Log the thumbnail URL
+            const img = new Image();
+            img.onload = function() {
+                console.log('Thumbnail loaded'); // Log thumbnail load
+                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
+            };
+            img.onerror = function() {
+                console.log('Thumbnail load failed'); // Log thumbnail load failure
+                tooltip.innerHTML = 'Thumbnail not available';
+            };
+            img.src = thumbnailUrl;
         });
 
         link.addEventListener('mouseleave', function() {
-            tooltip.innerHTML = ''; // Clear the tooltip content
+            this.querySelector('.tooltiptext').innerHTML = ''; // Clear the tooltip content
         });
     });
 }
@@ -241,6 +220,7 @@ function addYouTubeThumbnails() {
 document.addEventListener('DOMContentLoaded', function() {
     addYouTubeThumbnails();
 });
+
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
