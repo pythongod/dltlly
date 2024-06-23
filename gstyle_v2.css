@@ -114,40 +114,38 @@ input#searchBox {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 0; /* Forces cell to respect width */
+}
+
+/* Hover effect for all cells except URL column */
+#data-table td:not(:nth-child(10)):hover {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
+    background-color: #f8f8f8; /* Light background on hover for visibility */
 }
 
 /* Specific styling for Name columns */
 #data-table td:nth-child(1), #data-table td:nth-child(2) {
-    position: relative;
-}
-
-/* Hover effect for Name columns */
-#data-table td:nth-child(1):hover, #data-table td:nth-child(2):hover {
-    white-space: normal;
-    overflow: visible;
-    z-index: 10;
-}
-
-#data-table td:nth-child(1):hover::after, #data-table td:nth-child(2):hover::after {
-    content: attr(title);
-    position: absolute;
-    left: 0;
-    top: 100%;
-    white-space: normal;
-    background-color: #fff;
-    padding: 5px;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 20;
-    max-width: 300px; /* Adjust as needed */
-    word-wrap: break-word;
+    max-width: 150px; /* Adjust as needed */
 }
 
 /* Ensure the URL column doesn't truncate */
 #data-table td:nth-child(10) {
     white-space: nowrap;
     overflow: visible;
+}
+
+/* Hide ID and hidden columns */
+#data-table th:nth-child(12), #data-table td:nth-child(12),
+#data-table th:nth-child(13), #data-table td:nth-child(13) {
+    display: none;
+}
+
+/* Dark mode adjustments */
+body.dark-mode #data-table td:not(:nth-child(10)):hover {
+    background-color: #2a2a2a; /* Darker background on hover for dark mode */
 }
 
 /* Dark mode adjustments */
