@@ -194,9 +194,7 @@ function addYouTubeThumbnails() {
         const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
         if (!link) return;
 
-        console.log('Link found:', link.href); // Add this line
-
-        if (link.dataset.thumbnailAdded) return; // Avoid adding multiple listeners
+        if (link.dataset.thumbnailAdded) return;
         link.dataset.thumbnailAdded = 'true';
 
         const tooltip = link.querySelector('.tooltiptext');
@@ -207,18 +205,18 @@ function addYouTubeThumbnails() {
 
         link.addEventListener('mouseenter', function() {
             const videoId = new URLSearchParams(new URL(this.href).search).get('v');
-            console.log('Video ID:', videoId);
-            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-            console.log('Thumbnail URL:', thumbnailUrl);
+            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
             
             const img = new Image();
             img.onload = function() {
                 console.log('Thumbnail loaded');
-                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
+                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%; height: auto;">`;
             };
             img.onerror = function() {
-                console.log('Thumbnail load failed');
-                tooltip.innerHTML = 'Thumbnail not available';
+                console.log('Thumbnail load failed, trying hqdefault');
+                // Fallback to hqdefault if maxresdefault is not available
+                const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                tooltip.innerHTML = `<img src="${fallbackUrl}" alt="Video Thumbnail" style="width: 100%; height: auto;">`;
             };
             img.src = thumbnailUrl;
         });
