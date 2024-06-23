@@ -1,6 +1,7 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
-const localCSVURL = '/data/gsheet_battle_events.csv';
+const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSTQCuvOmXn1mJTpP8Xsxs_hQGuGvKgWuvbb_ZwvuM2rCb0hBmNUOEKiyk25-hy5ljG-4tCuLqVwrRx/pub?gid=1245526804&single=true&output=csv';
+const localGsheetCSVURL = '/data/gsheet_battle_events.csv';
 
 // Function to parse CSV text into a 2D array
 function parseCSV(text) {
@@ -16,29 +17,32 @@ function populateTable(data, searchText = '') {
         if (index === 0) return; // Skip header row
         count++; // Increment count for each row
         const tr = document.createElement('tr');
-        row.forEach((cell, cellIndex) => {
-            if (cellIndex === 8) return; // Skip the ID column
-
+        
+        // Define the order of columns we want
+        const columnOrder = [0, 1, 12, 10, 11, 3, 4, 5, 6, 7, 9];
+        
+        columnOrder.forEach(cellIndex => {
             const td = document.createElement('td');
+            let cellContent = row[cellIndex];
 
-            if (cellIndex === 9) { // Assuming 9 is the Views column
-                td.textContent = parseInt(cell).toLocaleString();
-            } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
-                td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-            } else {
-                td.textContent = cell;
+            // Special handling for Views column
+            if (cellIndex === 9) {
+                cellContent = parseInt(cellContent).toLocaleString();
             }
 
-            if (cellIndex === 7) { // Assuming 7 is the URL column
-                const URL = `${row[7]}`;
+            // Special handling for URL column
+            if (cellIndex === 7) {
                 const URLtext = 'Link';
-                td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+                td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+            } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
+                td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+            } else {
+                td.textContent = cellContent;
             }
 
-            if (cellIndex < 10) {
-                tr.appendChild(td);
-            }
+            tr.appendChild(td);
         });
+
         tableBody.appendChild(tr);
     });
     document.getElementById('search-results').textContent = `Search results: ${count}`;
@@ -78,7 +82,7 @@ function sortDataByViews(data, isAscending) {
 function searchTable(data, searchText) {
     const filteredData = data.filter((row, index) => {
         if (index === 0) return true;
-        return row.some((cell) => cell.toLowerCase().includes(searchText.toLowerCase()));
+        return row.some(cell => cell.toLowerCase().includes(searchText.toLowerCase()));
     });
     currentData = filteredData;
     const numResults = filteredData.length - 1;
@@ -105,29 +109,29 @@ function toggleDarkMode(on) {
 }
 
 // Function to fetch data from a given URL and populate the table
-function fetchData(url, searchText = '', updateTable = true) {
+function fetchData(url, searchText = '') {
     return fetch(url)
         .then(response => response.text())
         .then(text => {
-            const data = parseCSV(text);
-            if (data.length > 1) {
-                csvData = data;
-                currentData = data;
-                if (updateTable) {
-                    if (searchText) {
-                        searchTable(data, searchText);
-                    } else {
-                        populateTable(data);
-                    }
-                }
+            csvData = parseCSV(text);
+            currentData = csvData;
+            if (searchText) {
+                searchTable(csvData, searchText);
             } else {
-                throw new Error('No data found');
+                populateTable(csvData, searchText);
             }
         })
-        .catch(error => {
-            console.error('Error fetching the CSV file:', error);
-            throw error;
-        });
+        .catch(error => console.error('Error fetching the CSV file:', error));
+}
+
+// Function to fetch the latest Google Sheet data
+function fetchOnlineData() {
+    fetchData(googleSheetURL)
+        .then(() => {
+            populateTable(csvData);
+            console.log('Table updated with latest Google Sheets data.');
+        })
+        .catch(error => console.error('Failed to load Google Sheets data.', error));
 }
 
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
@@ -135,20 +139,10 @@ document.getElementById('dark-mode-toggle').addEventListener('click', function()
     localStorage.setItem("theme", isDarkMode ? "dark" : "light");
 });
 
-// Check local storage for theme preference and apply it
-document.addEventListener('DOMContentLoaded', (event) => {
-    // Retrieve the preferred theme from local storage
-    const preferredTheme = localStorage.getItem("theme");
-    
-    // Apply dark mode only if the stored theme is 'dark'
-    const isDarkMode = preferredTheme === "dark";
-    toggleDarkMode(isDarkMode);
-});
-
+// Combined DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
     const searchBox = document.getElementById('searchBox');
     const searchText = getUrlParameter('search') || '';
-    const initialSource = getUrlParameter('source') || 'local-csv';
 
     document.getElementById('sort-uploaded').addEventListener('click', () => {
         const sortedData = sortDataByUploaded(csvData);
@@ -170,26 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
         searchTable(csvData, searchBox.value);
     });
 
-    document.querySelectorAll('.data-source-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const source = this.getAttribute('data-source');
-            if (source === 'local-csv') {
-                fetchData(localCSVURL, searchText)
-                    .catch(() => console.error('Failed to load local CSV data.'));
-            }
-            document.querySelectorAll('.data-source-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        });
-    });
-
-    const handleSearchLocal = () => searchTable(csvData, searchBox.value);
-
-    // Initial fetch from the local CSV file based on the default or URL parameter
-    fetchData(localCSVURL, searchText)
-        .then(() => searchBox.addEventListener('input', handleSearchLocal))
-        .catch(() => console.error('Failed to load local CSV data.'));
-
-    searchBox.value = searchText;
+    // Initial fetch from the local Google Sheet CSV file
+    fetchData(localGsheetCSVURL, searchText);
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -206,6 +182,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('last-updated').textContent += formattedDateTime;
         })
         .catch(error => console.error('Error fetching or parsing the YAML file:', error));
+
+    // Check local storage for theme preference and apply it
+    const preferredTheme = localStorage.getItem("theme");
+    const isDarkMode = preferredTheme === "dark";
+    toggleDarkMode(isDarkMode);
 });
 
 // Function to add YouTube thumbnails on hover
