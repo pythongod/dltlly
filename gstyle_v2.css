@@ -95,7 +95,7 @@ input#searchBox {
 #data-table th:nth-child(5), #data-table td:nth-child(5) { width: 7.5%; }
 #data-table th:nth-child(6), #data-table td:nth-child(6) { width: 7.5%; }
 #data-table th:nth-child(7), #data-table td:nth-child(7) { width: 5%; }
-#data-table th:nth-child(8), #data-table td:nth-child(8) { width: 5%; }
+#data-table th:nth-child(8), #data-table td:nth-child(8) { width: 30%; }
 /* #data-table th:nth-child(9), #data-table td:nth-child(9) { width: 7.5%; }
 #data-table th:nth-child(10), #data-table td:nth-child(10) { width: 5%; }
 #data-table th:nth-child(11), #data-table td:nth-child(11) { width: 7.5%; } */
