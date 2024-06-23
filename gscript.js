@@ -191,10 +191,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
-    const youtubeLinks = document.querySelectorAll('td a.tooltip[href*="youtube.com/watch"]');
+    document.querySelector('#data-table').addEventListener('mouseover', function(event) {
+        const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
+        if (!link) return;
 
-    youtubeLinks.forEach(link => {
-        const tooltip = link.nextElementSibling; // This should be the div.tooltiptext
+        const tooltip = link.nextElementSibling;
         if (!tooltip || !tooltip.classList.contains('tooltiptext')) {
             console.error('Tooltip element not found or incorrect');
             return;
@@ -211,7 +212,6 @@ function addYouTubeThumbnails() {
                     'default.jpg'
                 ];
 
-                // Show loading indicator
                 tooltip.innerHTML = '<div class="loading">Loading thumbnail...</div>';
 
                 function tryNextThumbnail(index = 0) {
@@ -242,8 +242,11 @@ function addYouTubeThumbnails() {
     });
 }
 
-// Make sure to call this function after the table is populated
-document.addEventListener('DOMContentLoaded', addYouTubeThumbnails);
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure thumbnails are added after the table is populated
+    addYouTubeThumbnails();
+});
+
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
