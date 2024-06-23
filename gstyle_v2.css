@@ -99,6 +99,29 @@ input#searchBox {
 #data-table th:nth-child(9), #data-table td:nth-child(9) { width: 7.5%; } /* Uploaded */
 #data-table th:nth-child(10), #data-table td:nth-child(10) { width: 5%; } /* URL */
 #data-table th:nth-child(11), #data-table td:nth-child(11) { width: 7.5%; } /* Views */
+/* Hide ID and hidden columns */
+#data-table th:nth-child(12), #data-table td:nth-child(12),
+#data-table th:nth-child(13), #data-table td:nth-child(13) {
+    display: none;
+}
+
+#data-table td {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#data-table td:hover {
+    overflow: visible;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* Ensure link cells (URL column) always show full content */
+#data-table td:nth-child(10) {
+    overflow: visible;
+    white-space: nowrap;
+}
 
 #data-table th, #data-table td {
     padding: 12px 15px;
