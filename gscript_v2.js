@@ -20,7 +20,7 @@ function populateTable(data, searchText = '') {
         // Define the order of columns we want
         // Name #1,Name #2,Event,Location,Stadt,Type,Year,Channel,Uploaded,URL,Views,ID,hidden
         // 0 Name #1	1 Name #2	2 Event	3 Location	4 Stadt	5 Type	6 Year	7 Channel	8 Uploaded	9 URL	10 Views 11 ID 12 hidden
-        const columnOrder = [0, 1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11];
+        const columnOrder = [0, 1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12];
         
         columnOrder.forEach(cellIndex => {
             const td = document.createElement('td');
