@@ -70,11 +70,7 @@ function sortDataByViews(data, isAscending) {
         const viewsA = parseInt(a[9]);
         const viewsB = parseInt(b[9]);
 
-        if (isAscending) {
-            return viewsA - viewsB; // For ascending order
-        } else {
-            return viewsB - viewsA; // For descending order
-        }
+        return isAscending ? viewsA - viewsB : viewsB - viewsA; // For ascending or descending order
     });
 }
 
@@ -99,13 +95,8 @@ function getUrlParameter(name) {
 // Function to toggle dark mode
 function toggleDarkMode(on) {
     const body = document.body;
-    if (on) {
-        body.classList.add("dark-mode");
-        localStorage.setItem("theme", "dark");
-    } else {
-        body.classList.remove("dark-mode");
-        localStorage.setItem("theme", "light");
-    }
+    body.classList.toggle("dark-mode", on);
+    localStorage.setItem("theme", on ? "dark" : "light");
 }
 
 // Function to fetch data from a given URL and populate the table
@@ -185,8 +176,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check local storage for theme preference and apply it
     const preferredTheme = localStorage.getItem("theme");
-    const isDarkMode = preferredTheme === "dark";
-    toggleDarkMode(isDarkMode);
+    toggleDarkMode(preferredTheme === "dark");
+
+    // Ensure thumbnails are added after the table is populated
+    addYouTubeThumbnails();
 });
 
 // Function to add YouTube thumbnails on hover
@@ -195,8 +188,8 @@ function addYouTubeThumbnails() {
         const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
         if (!link) return;
 
-        const tooltip = link.nextElementSibling;
-        if (!tooltip || !tooltip.classList.contains('tooltiptext')) {
+        const tooltip = link.querySelector('.tooltiptext');
+        if (!tooltip) {
             console.error('Tooltip element not found or incorrect');
             return;
         }
@@ -241,12 +234,6 @@ function addYouTubeThumbnails() {
         });
     });
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Ensure thumbnails are added after the table is populated
-    addYouTubeThumbnails();
-});
-
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
