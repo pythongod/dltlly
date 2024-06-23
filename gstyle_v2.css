@@ -301,3 +301,10 @@ body.dark-mode .tooltip .tooltiptext {
     border-color: #555;
 }
 
+#data-table td a {
+    background-color: yellow !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    width: auto !important;
+    display: inline-block !important;
+}
