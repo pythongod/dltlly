@@ -45,7 +45,7 @@ function populateTable(data, searchText = '') {
         tableBody.appendChild(tr);
     });
     document.getElementById('search-results').textContent = `Search results: ${count}`;
-    addYouTubeThumbnails(); // Add YouTube thumbnails after populating the table
+    //addYouTubeThumbnails(); // Add YouTube thumbnails after populating the table
 }
 
 // Function to sort data by uploaded date
