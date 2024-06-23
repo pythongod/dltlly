@@ -1,7 +1,7 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
 const googleSheetURL = 'https://docs.google.com/spreadsheets/d/1Bi3UKWBt45cCUnTKHLlh5MhIFmF7D6F-TvggV0DyHlw/edit?gid=1245526804#gid=1245526804&single=true&output=csv';
-const localGsheetCSVURL = '/data/gsheet_battle_events.csv';
+const localGsheetCSVURL = '/data/gsheet_battle_events_v2.csv';
 
 // Function to parse CSV text into a 2D array
 function parseCSV(text) {
@@ -18,6 +18,7 @@ function populateTable(data, searchText = '') {
         const tr = document.createElement('tr');
         
         // Define the order of columns we want
+        // Name #1,Name #2,Event,Location,Stadt,Type,Year,Channel,Uploaded,URL,Views,ID,hidden
         // 0 Name #1	1 Name #2	2 Event	3 Location	4 Stadt	5 Type	6 Year	7 Channel	8 Uploaded	9 URL	10 Views 11 ID 12 hidden
         const columnOrder = [0, 1, 2, 3, 4, 5, 5, 7, 8, 9, 10];
         
