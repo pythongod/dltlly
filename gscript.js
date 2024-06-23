@@ -201,7 +201,7 @@ function addYouTubeThumbnails() {
 
             const videoId = new URLSearchParams(new URL(link.href).search).get('v');
             if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
                 const img = new Image();
                 img.onload = function() {
                     tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail">`;
