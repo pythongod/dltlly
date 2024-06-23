@@ -174,7 +174,7 @@ input#searchBox {
     margin-bottom: 5px;
     opacity: 0;
     transition: opacity 0.3s, visibility 0.3s;
-    margin-left: -640px; /* Center the tooltip */
+    margin-left: -320px; /* Center the tooltip */
     pointer-events: none;
     max-height: 80vh;
     overflow-y: auto;
