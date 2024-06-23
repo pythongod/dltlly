@@ -190,22 +190,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to add YouTube thumbnails on hover
+// Improved implementation
 function addYouTubeThumbnails() {
     const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
 
     youtubeLinks.forEach(link => {
         const tooltip = link.querySelector('.tooltiptext');
+        let thumbnailImg = null;
 
         link.addEventListener('mouseover', function() {
-            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-            if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
+            if (!thumbnailImg) {
+                const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+                if (videoId) {
+                    thumbnailImg = document.createElement('img');
+                    thumbnailImg.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                    thumbnailImg.alt = "Thumbnail";
+                    thumbnailImg.style.width = "100%";
+                    tooltip.appendChild(thumbnailImg);
+                }
             }
+            tooltip.style.display = 'block';
         });
 
         link.addEventListener('mouseleave', function() {
-            tooltip.innerHTML = ''; // Clear the tooltip content
+            tooltip.style.display = 'none';
         });
     });
 }
