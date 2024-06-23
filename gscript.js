@@ -31,9 +31,9 @@ function populateTable(data, searchText = '') {
             }
 
             // Special handling for URL column
-            if (cellIndex === 7) {
+            if (cellIndex === 7) { // URL column
                 const URLtext = 'Link';
-                td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+                td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<span class="tooltiptext"></span></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
                 td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
             } else {
@@ -191,26 +191,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
-    const youtubeLinks = document.querySelectorAll('#data-table td:nth-child(10) a');
-    console.log('Found YouTube links:', youtubeLinks.length);
+    const youtubeLinks = document.querySelectorAll('#data-table td:nth-child(10) a.tooltip');
 
     youtubeLinks.forEach(link => {
         const tooltip = link.querySelector('.tooltiptext');
-        console.log('Link:', link.href, 'Tooltip:', tooltip);
 
         link.addEventListener('mouseover', function() {
-            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-            console.log('Video ID:', videoId);
-            if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
-                console.log('Set thumbnail:', thumbnailUrl);
-            }
-        });
+            if (tooltip.innerHTML !== '') return; // Skip if thumbnail is already loaded
 
-        link.addEventListener('mouseleave', function() {
-            tooltip.innerHTML = ''; // Clear the tooltip content
-            console.log('Cleared tooltip');
+            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+            if (videoId) {
+                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                const img = new Image();
+                img.onload = function() {
+                    tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail">`;
+                };
+                img.onerror = function() {
+                    tooltip.innerHTML = 'Thumbnail not available';
+                };
+                img.src = thumbnailUrl;
+            }
         });
     });
 }
