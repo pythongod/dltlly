@@ -20,19 +20,19 @@ function populateTable(data, searchText = '') {
         // Define the order of columns we want
         // Name #1,Name #2,Event,Location,Stadt,Type,Year,Channel,Uploaded,URL,Views,ID,hidden
         // 0 Name #1	1 Name #2	2 Event	3 Location	4 Stadt	5 Type	6 Year	7 Channel	8 Uploaded	9 URL	10 Views 11 ID 12 hidden
-        const columnOrder = [0, 1, 2, 3, 4, 5, 5, 7, 8, 9, 10];
+        const columnOrder = [0, 1, 2, 3, 4, 5, 5, 7, 8, 9, 10, 11, 12];
         
         columnOrder.forEach(cellIndex => {
             const td = document.createElement('td');
             let cellContent = row[cellIndex];
 
             // Special handling for Views column
-            if (cellIndex === 11) {
+            if (cellIndex === 10) {
                 cellContent = parseInt(cellContent).toLocaleString();
             }
 
             // Special handling for URL column
-            if (cellIndex === 10) {
+            if (cellIndex === 9) {
                 const URLtext = 'Link123';
                 td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
