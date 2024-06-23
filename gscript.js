@@ -191,13 +191,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
-    const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
+    const youtubeLinks = document.querySelectorAll('td a.tooltip[href*="youtube.com/watch"]');
 
     youtubeLinks.forEach(link => {
-        const tooltip = link.querySelector('.tooltiptext');
+        const tooltip = link.nextElementSibling; // This should be the div.tooltiptext
+        if (!tooltip || !tooltip.classList.contains('tooltiptext')) {
+            console.error('Tooltip element not found or incorrect');
+            return;
+        }
 
-        link.addEventListener('mouseover', function() {
-            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+        link.addEventListener('mouseenter', function() {
+            const videoId = new URLSearchParams(new URL(this.href).search).get('v');
             if (videoId) {
                 const thumbnailQualities = [
                     'maxresdefault.jpg',
@@ -206,6 +210,9 @@ function addYouTubeThumbnails() {
                     'mqdefault.jpg',
                     'default.jpg'
                 ];
+
+                // Show loading indicator
+                tooltip.innerHTML = '<div class="loading">Loading thumbnail...</div>';
 
                 function tryNextThumbnail(index = 0) {
                     if (index >= thumbnailQualities.length) {
@@ -217,7 +224,7 @@ function addYouTubeThumbnails() {
                     const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${thumbnailQualities[index]}`;
                     const img = new Image();
                     img.onload = function() {
-                        tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
+                        tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
                     };
                     img.onerror = function() {
                         tryNextThumbnail(index + 1);
@@ -234,6 +241,9 @@ function addYouTubeThumbnails() {
         });
     });
 }
+
+// Make sure to call this function after the table is populated
+document.addEventListener('DOMContentLoaded', addYouTubeThumbnails);
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
