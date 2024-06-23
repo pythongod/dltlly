@@ -194,6 +194,11 @@ function addYouTubeThumbnails() {
         const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
         if (!link) return;
 
+        console.log('Link found:', link.href); // Add this line
+
+        if (link.dataset.thumbnailAdded) return; // Avoid adding multiple listeners
+        link.dataset.thumbnailAdded = 'true';
+
         const tooltip = link.querySelector('.tooltiptext');
         if (!tooltip) {
             console.error('Tooltip element not found or incorrect for link:', link);
@@ -202,23 +207,24 @@ function addYouTubeThumbnails() {
 
         link.addEventListener('mouseenter', function() {
             const videoId = new URLSearchParams(new URL(this.href).search).get('v');
-            console.log('Video ID:', videoId); // Log the video ID
-            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-            console.log('Thumbnail URL:', thumbnailUrl); // Log the thumbnail URL
+            console.log('Video ID:', videoId);
+            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+            console.log('Thumbnail URL:', thumbnailUrl);
+            
             const img = new Image();
             img.onload = function() {
-                console.log('Thumbnail loaded'); // Log thumbnail load
+                console.log('Thumbnail loaded');
                 tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
             };
             img.onerror = function() {
-                console.log('Thumbnail load failed'); // Log thumbnail load failure
+                console.log('Thumbnail load failed');
                 tooltip.innerHTML = 'Thumbnail not available';
             };
             img.src = thumbnailUrl;
         });
 
         link.addEventListener('mouseleave', function() {
-            this.querySelector('.tooltiptext').innerHTML = ''; // Clear the tooltip content
+            this.querySelector('.tooltiptext').innerHTML = '';
         });
     });
 }
