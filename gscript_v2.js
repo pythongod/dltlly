@@ -33,11 +33,11 @@ function populateTable(data, searchText = '') {
 
             // Special handling for URL column
             if (cellIndex === 9) {
-                console.log("URL content:", cellContent);
+                // console.log("URL content:", cellContent);
                 const URLtext = 'Link';
-                console.log("Setting link text to:", URLtext);
+                // console.log("Setting link text to:", URLtext);
                 td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
-                console.log("Resulting innerHTML:", td.innerHTML);
+                // console.log("Resulting innerHTML:", td.innerHTML);
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
                 td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
             } else {
