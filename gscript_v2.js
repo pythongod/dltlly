@@ -1,6 +1,7 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
-const googleSheetURL = 'https://docs.google.com/spreadsheets/d/1Bi3UKWBt45cCUnTKHLlh5MhIFmF7D6F-TvggV0DyHlw/edit?gid=1245526804#gid=1245526804&single=true&output=csv';
+// The premise is that your Google Sheet is published publicly. This is not intuitive for many folks. (Choose File -> Publish to Web...) Datei -> freigeben
+const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCSU0I6H0UdK-smWWr5t1X97dnYMst2HXJ10UFLEzwt0_EnfAwGlxHhhhRbVYsZNUV7O98tBi5_vZT/pub?gid=1245526804&single=true&output=csv';
 const localGsheetCSVURL = '/data/gsheet_battle_events_v2.csv';
 
 // Function to parse CSV text into a 2D array
