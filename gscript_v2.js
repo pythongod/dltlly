@@ -209,7 +209,7 @@ function addYouTubeThumbnails() {
             
             const img = new Image();
             img.onload = function() {
-                console.log('Thumbnail loaded');
+                // console.log('Thumbnail loaded');
                 tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%; height: auto;">`;
             };
             img.onerror = function() {
