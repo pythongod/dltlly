@@ -147,11 +147,29 @@ function searchTableByColumn(data, columnSearches) {
         return Object.entries(columnSearches).every(([column, searchText]) => {
             const columnIndex = data[0].findIndex(header => 
                 header.toLowerCase() === column.toLowerCase());
-            if (columnIndex === -1) return true; // Column not found, ignore this search
+            if (columnIndex === -1) {
+                console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
+                return true; // Column not found, ignore this search
+            }
             return row[columnIndex].toLowerCase().includes(searchText.toLowerCase());
         });
     });
 }
+
+function updateUIWithAppliedFilters(filters) {
+    const filterDisplay = document.getElementById('applied-filters') || createFilterDisplay();
+    filterDisplay.innerHTML = 'Applied Filters: ' + 
+        Object.entries(filters).map(([column, value]) => `${column}: ${value}`).join(', ');
+}
+
+function createFilterDisplay() {
+    const filterDisplay = document.createElement('div');
+    filterDisplay.id = 'applied-filters';
+    filterDisplay.style.marginBottom = '10px';
+    document.querySelector('.info-container').appendChild(filterDisplay);
+    return filterDisplay;
+}
+
 
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     const isDarkMode = document.body.classList.toggle('dark-mode');
@@ -173,8 +191,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const filteredData = searchTableByColumn(csvData, searchParams);
         populateTable(filteredData);
         // Update the search box to reflect the search
-        document.getElementById('searchBox').value = Object.values(searchParams).join(' ');
+        const searchBox = document.getElementById('searchBox');
+        searchBox.value = Object.values(searchParams).join(' ');
+        // Trigger the search
+        searchTable(csvData, searchBox.value);
+        // Update UI with applied filters
+        updateUIWithAppliedFilters(searchParams);
     }
+    // Modify your existing search event listener to combine global and column-specific search
+    searchBox.addEventListener('input', () => {
+        const globalSearchTerm = searchBox.value;
+        const columnSearches = parseURLParams();
+        let filteredData = searchTableByColumn(csvData, columnSearches);
+        filteredData = filteredData.filter(row => 
+            row.some(cell => cell.toLowerCase().includes(globalSearchTerm.toLowerCase()))
+        );
+        populateTable(filteredData);
+        updateUIWithAppliedFilters({...columnSearches, 'Global': globalSearchTerm});
+    });
 
     document.getElementById('sort-views').addEventListener('click', () => {
         const header = document.getElementById('sort-views');
