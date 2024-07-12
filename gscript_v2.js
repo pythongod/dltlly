@@ -156,6 +156,28 @@ function searchTableByColumn(data, columnSearches) {
     });
 }
 
+// Ensure this function is called after data is loaded
+function applyInitialFilters() {
+    const searchParams = parseURLParams();
+    if (Object.keys(searchParams).length > 0) {
+        currentData = searchTableByColumn(csvData, searchParams);
+        populateTable(currentData);
+        updateUIWithAppliedFilters(searchParams);
+    }
+}
+
+// Modify your fetchData function to call applyInitialFilters after data is loaded
+function fetchData(url) {
+    return fetch(url)
+        .then(response => response.text())
+        .then(text => {
+            csvData = parseCSV(text);
+            currentData = csvData;
+            applyInitialFilters(); // Apply filters after data is loaded
+        })
+        .catch(error => console.error('Error fetching the CSV file:', error));
+}
+
 function updateUIWithAppliedFilters(filters) {
     const filterDisplay = document.getElementById('applied-filters') || createFilterDisplay();
     filterDisplay.innerHTML = 'Applied Filters: ' + 
