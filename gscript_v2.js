@@ -244,7 +244,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Initial fetch from the local Google Sheet CSV file
-    fetchData(localGsheetCSVURL, searchText);
+    fetchData(localGsheetCSVURL).then(() => {
+        const searchParams = parseURLParams();
+        if (Object.keys(searchParams).length > 0) {
+            currentData = searchTableByColumn(csvData, searchParams);
+            populateTable(currentData);
+            searchBox.value = Object.values(searchParams).join(' ');
+            updateUIWithAppliedFilters(searchParams);
+        } else if (searchText) {
+            searchTable(csvData, searchText);
+        } else {
+            populateTable(csvData);
+        }
+        addYouTubeThumbnails();
+    });
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
