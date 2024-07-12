@@ -221,10 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
         populateTable([currentData[0], ...sortedData]);
     });
 
-    searchBox.addEventListener('input', () => {
-        searchTable(csvData, searchBox.value);
-    });
-
     // Initial fetch from the local Google Sheet CSV file
     fetchData(localGsheetCSVURL, searchText);
 
