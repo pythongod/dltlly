@@ -71,6 +71,10 @@ input#searchBox {
     text-align: right;
 }
 
+#applied-filters {
+    text-align: right;
+}
+
 .highlight {
     font-weight: bold;
 }
