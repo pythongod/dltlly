@@ -8,7 +8,6 @@ function parseCSV(text) {
     return text.split('\n').map(row => row.split(','));
 }
 
-// Function to populate the table with data
 function populateTable(data, searchText = '') {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
@@ -17,31 +16,37 @@ function populateTable(data, searchText = '') {
         if (index === 0) return; // Skip header row
         count++; // Increment count for each row
         const tr = document.createElement('tr');
-        row.forEach((cell, cellIndex) => {
-            if (cellIndex === 8) return; // Skip the ID column
-
+        
+        // Define the order of columns we want
+        // Name #1,Name #2,Event,Type,Year,Channel,Uploaded,URL,ID,Views,Location,Stadt,Event 2
+        const columnOrder = [0, 1, 12, 10, 11, 3, 4, 5, 6, 7, 9];
+        
+        columnOrder.forEach(cellIndex => {
             const td = document.createElement('td');
+            let cellContent = row[cellIndex];
 
-            if (cellIndex === 9) { // Correct this to match the 'Views' column if indices changed
-                td.textContent = parseInt(cell).toLocaleString();
-            } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
-                td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-            } else {
-                td.textContent = cell;
+            // Special handling for Views column
+            if (cellIndex === 9) {
+                cellContent = parseInt(cellContent).toLocaleString();
             }
 
-            if (cellIndex === 7) { // Correct this if the indices shift due to column removal
-                const URL = `${row[7]}`;
+            // Special handling for URL column
+            if (cellIndex === 7) {
                 const URLtext = 'Link';
-                td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+                td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+            } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
+                td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+            } else {
+                td.textContent = cellContent;
             }
 
             tr.appendChild(td);
         });
+
         tableBody.appendChild(tr);
     });
     document.getElementById('search-results').textContent = `Search results: ${count}`;
-    addYouTubeThumbnails(); // Add YouTube thumbnails after populating the table
+    //addYouTubeThumbnails(); // Add YouTube thumbnails after populating the table
 }
 
 // Function to sort data by uploaded date
@@ -65,11 +70,7 @@ function sortDataByViews(data, isAscending) {
         const viewsA = parseInt(a[9]);
         const viewsB = parseInt(b[9]);
 
-        if (isAscending) {
-            return viewsA - viewsB; // For ascending order
-        } else {
-            return viewsB - viewsA; // For descending order
-        }
+        return isAscending ? viewsA - viewsB : viewsB - viewsA; // For ascending or descending order
     });
 }
 
@@ -94,13 +95,8 @@ function getUrlParameter(name) {
 // Function to toggle dark mode
 function toggleDarkMode(on) {
     const body = document.body;
-    if (on) {
-        body.classList.add("dark-mode");
-        localStorage.setItem("theme", "dark");
-    } else {
-        body.classList.remove("dark-mode");
-        localStorage.setItem("theme", "light");
-    }
+    body.classList.toggle("dark-mode", on);
+    localStorage.setItem("theme", on ? "dark" : "light");
 }
 
 // Function to fetch data from a given URL and populate the table
@@ -180,30 +176,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check local storage for theme preference and apply it
     const preferredTheme = localStorage.getItem("theme");
-    const isDarkMode = preferredTheme === "dark";
-    toggleDarkMode(isDarkMode);
+    toggleDarkMode(preferredTheme === "dark");
+
+    // Ensure thumbnails are added after the table is populated
+    addYouTubeThumbnails();
 });
 
 // Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
-    const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
+    document.querySelector('#data-table').addEventListener('mouseover', function(event) {
+        const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
+        if (!link) return;
 
-    youtubeLinks.forEach(link => {
         const tooltip = link.querySelector('.tooltiptext');
+        if (!tooltip) {
+            console.error('Tooltip element not found or incorrect for link:', link);
+            return;
+        }
 
-        link.addEventListener('mouseover', function() {
-            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-            if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
-            }
+        link.addEventListener('mouseenter', function() {
+            const videoId = new URLSearchParams(new URL(this.href).search).get('v');
+            console.log('Video ID:', videoId); // Log the video ID
+            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+            console.log('Thumbnail URL:', thumbnailUrl); // Log the thumbnail URL
+            const img = new Image();
+            img.onload = function() {
+                console.log('Thumbnail loaded'); // Log thumbnail load
+                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%;">`;
+            };
+            img.onerror = function() {
+                console.log('Thumbnail load failed'); // Log thumbnail load failure
+                tooltip.innerHTML = 'Thumbnail not available';
+            };
+            img.src = thumbnailUrl;
         });
 
         link.addEventListener('mouseleave', function() {
-            tooltip.innerHTML = ''; // Clear the tooltip content
+            this.querySelector('.tooltiptext').innerHTML = ''; // Clear the tooltip content
         });
     });
 }
+
 
 function applyFilter(filter) {
     document.getElementById('searchBox').value = filter;
