@@ -132,6 +132,27 @@ function fetchOnlineData() {
         .catch(error => console.error('Failed to load Google Sheets data.', error));
 }
 
+function parseURLParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParams = {};
+    for (const [key, value] of urlParams) {
+        searchParams[key.toLowerCase()] = value;
+    }
+    return searchParams;
+}
+
+function searchTableByColumn(data, columnSearches) {
+    return data.filter((row, index) => {
+        if (index === 0) return true; // Keep the header row
+        return Object.entries(columnSearches).every(([column, searchText]) => {
+            const columnIndex = data[0].findIndex(header => 
+                header.toLowerCase() === column.toLowerCase());
+            if (columnIndex === -1) return true; // Column not found, ignore this search
+            return row[columnIndex].toLowerCase().includes(searchText.toLowerCase());
+        });
+    });
+}
+
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     const isDarkMode = document.body.classList.toggle('dark-mode');
     localStorage.setItem("theme", isDarkMode ? "dark" : "light");
@@ -146,6 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const sortedData = sortDataByUploaded(csvData);
         populateTable([csvData[0], ...sortedData]);
     });
+
+    const searchParams = parseURLParams();
+    if (Object.keys(searchParams).length > 0) {
+        const filteredData = searchTableByColumn(csvData, searchParams);
+        populateTable(filteredData);
+        // Update the search box to reflect the search
+        document.getElementById('searchBox').value = Object.values(searchParams).join(' ');
+    }
 
     document.getElementById('sort-views').addEventListener('click', () => {
         const header = document.getElementById('sort-views');
