@@ -97,8 +97,8 @@ input#searchBox {
 #data-table th:nth-child(6), #data-table td:nth-child(6) { width: 7.5%; } /* Type */
 #data-table th:nth-child(7), #data-table td:nth-child(7) { width: 5%; } /* Year */
 #data-table th:nth-child(8), #data-table td:nth-child(8) { width: 5%; } /* League */
-#data-table th:nth-child(9), #data-table td:nth-child(9) { width: 7.5%; } /* Uploaded */
-#data-table th:nth-child(10), #data-table td:nth-child(10) { width: 5%; } /* URL */
+#data-table th:nth-child(9), #data-table td:nth-child(9) { width: 8.5%; } /* Uploaded */
+#data-table th:nth-child(10), #data-table td:nth-child(10) { width: 4%; } /* URL */
 #data-table th:nth-child(11), #data-table td:nth-child(11) { width: 7.5%; } /* Views */
 /* Hide ID and hidden columns */
 #data-table th:nth-child(12), #data-table td:nth-child(12),
