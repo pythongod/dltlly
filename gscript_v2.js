@@ -130,12 +130,12 @@
             if (index === 0) return true; // Keep the header row
             return Object.entries(columnSearches).every(([column, searchText]) => {
                 const columnIndex = data[0].findIndex(header => 
-                    header.toLowerCase() === column.toLowerCase());
+                    header.toLowerCase().trim() === column.toLowerCase().trim());
                 if (columnIndex === -1) {
                     console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
                     return true; // Column not found, ignore this search
                 }
-                return row[columnIndex].toLowerCase() === searchText.toLowerCase(); // Use strict equality
+                return row[columnIndex].toLowerCase().trim() === searchText.toLowerCase().trim();
             });
         });
     }
@@ -143,8 +143,10 @@
     // Modify the applyInitialFilters function
     function applyInitialFilters() {
         const searchParams = parseURLParams();
+        console.log('Search Params:', searchParams); // Log the parsed URL parameters
         if (Object.keys(searchParams).length > 0) {
             currentData = searchTableByColumn(csvData, searchParams);
+            console.log('Filtered Data:', currentData); // Log the filtered data
             populateTable(currentData);
             updateUIWithAppliedFilters(searchParams);
             document.getElementById('searchBox').value = Object.values(searchParams).join(' ');
@@ -160,6 +162,7 @@
             .then(response => response.text())
             .then(text => {
                 csvData = parseCSV(text);
+                console.log('CSV Data loaded:', csvData); // Log the loaded data
                 applyInitialFilters(); // Apply filters after data is loaded
             })
             .catch(error => console.error('Error fetching the CSV file:', error));
@@ -221,7 +224,11 @@
         });
     
         // Initial fetch from the local Google Sheet CSV file
-        fetchData(localGsheetCSVURL);
+        fetchData(localGsheetCSVURL).then(() => {
+            console.log('Data fetched and initial filters applied');
+        });
+
+
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 applyFilter(this.getAttribute('data-filter'));
