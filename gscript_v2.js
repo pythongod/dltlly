@@ -106,22 +106,6 @@
         localStorage.setItem("theme", on ? "dark" : "light");
     }
 
-    // Function to fetch data from a given URL and populate the table
-    function fetchData(url, searchText = '') {
-        return fetch(url)
-            .then(response => response.text())
-            .then(text => {
-                csvData = parseCSV(text);
-                currentData = csvData;
-                if (searchText) {
-                    searchTable(csvData, searchText);
-                } else {
-                    populateTable(csvData, searchText);
-                }
-            })
-            .catch(error => console.error('Error fetching the CSV file:', error));
-    }
-
     // Function to fetch the latest Google Sheet data
     function fetchOnlineData() {
         fetchData(googleSheetURL)
@@ -151,7 +135,7 @@
                     console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
                     return true; // Column not found, ignore this search
                 }
-                return row[columnIndex].toLowerCase().includes(searchText.toLowerCase());
+                return row[columnIndex].toLowerCase() === searchText.toLowerCase(); // Use strict equality
             });
         });
     }
@@ -180,6 +164,7 @@
             })
             .catch(error => console.error('Error fetching the CSV file:', error));
     }
+    
 
     function updateUIWithAppliedFilters(filters) {
         const filterDisplay = document.getElementById('applied-filters') || createFilterDisplay();
@@ -204,26 +189,23 @@
     // Combined DOMContentLoaded event listener
     document.addEventListener('DOMContentLoaded', function() {
         const searchBox = document.getElementById('searchBox');
-        const searchText = getUrlParameter('search') || '';
-
+    
         document.getElementById('sort-uploaded').addEventListener('click', () => {
-            const sortedData = sortDataByUploaded(csvData);
-            populateTable([csvData[0], ...sortedData]);
+            const sortedData = sortDataByUploaded(currentData);
+            populateTable([currentData[0], ...sortedData]);
         });
-
-        const searchParams = parseURLParams();
-        if (Object.keys(searchParams).length > 0) {
-            const filteredData = searchTableByColumn(csvData, searchParams);
-            populateTable(filteredData);
-            // Update the search box to reflect the search
-            const searchBox = document.getElementById('searchBox');
-            searchBox.value = Object.values(searchParams).join(' ');
-            // Trigger the search
-            searchTable(csvData, searchBox.value);
-            // Update UI with applied filters
-            updateUIWithAppliedFilters(searchParams);
-        }
-        // Modify your existing search event listener to combine global and column-specific search
+    
+        document.getElementById('sort-views').addEventListener('click', () => {
+            const header = document.getElementById('sort-views');
+            const isAscending = header.classList.contains('asc');
+            
+            header.classList.toggle('asc', !isAscending);
+            header.classList.toggle('desc', isAscending);
+    
+            const sortedData = sortDataByViews(currentData, isAscending);
+            populateTable([currentData[0], ...sortedData]);
+        });
+    
         searchBox.addEventListener('input', () => {
             const globalSearchTerm = searchBox.value;
             const columnSearches = parseURLParams();
@@ -237,21 +219,9 @@
             populateTable(filteredData);
             updateUIWithAppliedFilters({...columnSearches, 'Global': globalSearchTerm});
         });
-
-        document.getElementById('sort-views').addEventListener('click', () => {
-            const header = document.getElementById('sort-views');
-            const isAscending = header.classList.contains('asc');
-            
-            header.classList.toggle('asc', !isAscending);
-            header.classList.toggle('desc', isAscending);
-
-            const sortedData = sortDataByViews(currentData, isAscending);
-            populateTable([currentData[0], ...sortedData]);
-        });
-
+    
         // Initial fetch from the local Google Sheet CSV file
         fetchData(localGsheetCSVURL);
-
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 applyFilter(this.getAttribute('data-filter'));
