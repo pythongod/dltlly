@@ -125,7 +125,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const searchParams = {};
         for (const [key, value] of urlParams) {
-            searchParams[key.toLowerCase()] = value;
+            searchParams[key] = decodeURIComponent(value);
         }
         return searchParams;
     }
@@ -140,7 +140,7 @@
                     console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
                     return true; // Column not found, ignore this search
                 }
-                return row[columnIndex] && row[columnIndex].toLowerCase().trim() === searchText.toLowerCase().trim();
+                return row[columnIndex] && row[columnIndex].toLowerCase().trim().includes(searchText.toLowerCase().trim());
             });
         });
     }
@@ -210,6 +210,13 @@
     // Combined DOMContentLoaded event listener
     document.addEventListener('DOMContentLoaded', function() {
         const searchBox = document.getElementById('searchBox');
+        searchBox.addEventListener('input', () => {
+            const searchTerm = searchBox.value.toLowerCase();
+            const filteredData = currentData.filter(row => 
+                row.some(cell => cell.toLowerCase().includes(searchTerm))
+            );
+            populateTable(filteredData);
+        });
     
         document.getElementById('sort-uploaded').addEventListener('click', () => {
             const sortedData = sortDataByUploaded(currentData);
