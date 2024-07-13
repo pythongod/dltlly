@@ -132,8 +132,16 @@
                 const columnIndex = data[0].findIndex(header => 
                     header.toLowerCase().trim() === column.toLowerCase().trim());
                 if (columnIndex === -1) {
-                    console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
-                    return true; // Column not found, ignore this search
+                    // Try to find a similar column name
+                    const similarColumnIndex = data[0].findIndex(header => 
+                        header.toLowerCase().includes(column.toLowerCase()));
+                    if (similarColumnIndex !== -1) {
+                        console.log(`Column "${column}" not found, using similar column "${data[0][similarColumnIndex]}"`);
+                        columnIndex = similarColumnIndex;
+                    } else {
+                        console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
+                        return true; // Column not found, ignore this search
+                    }
                 }
                 return row[columnIndex].toLowerCase().trim() === searchText.toLowerCase().trim();
             });
@@ -143,10 +151,11 @@
     // Modify the applyInitialFilters function
     function applyInitialFilters() {
         const searchParams = parseURLParams();
-        console.log('Search Params:', searchParams); // Log the parsed URL parameters
+        console.log('Search Params:', searchParams);
         if (Object.keys(searchParams).length > 0) {
             currentData = searchTableByColumn(csvData, searchParams);
-            console.log('Filtered Data:', currentData); // Log the filtered data
+            console.log('Filtered Data:', currentData);
+            console.log('Filtered Data Length:', currentData.length);
             populateTable(currentData);
             updateUIWithAppliedFilters(searchParams);
             document.getElementById('searchBox').value = Object.values(searchParams).join(' ');
@@ -182,6 +191,9 @@
         document.querySelector('.info-container').appendChild(filterDisplay);
         return filterDisplay;
     }
+
+    console.log('CSV Headers:', csvData[0]);
+
 
 
     document.getElementById('dark-mode-toggle').addEventListener('click', function() {
