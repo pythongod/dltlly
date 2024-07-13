@@ -10,50 +10,55 @@
     }
 
     function populateTable(data, searchText = '') {
-        const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-        let count = 0; // Initialize a counter for the number of rows
-        data.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-            count++; // Increment count for each row
-            const tr = document.createElement('tr');
-            
-            // Define the order of columns we want
-            // Name #1,Name #2,Event,Location,Stadt,Type,Year,Channel,Uploaded,URL,Views,ID,hidden
-            // 0 Name #1	1 Name #2	2 Event	3 Location	4 Stadt	5 Type	6 Year	7 Channel	8 Uploaded	9 URL	10 Views 11 ID 12 hidden
-            const columnOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-            
-            columnOrder.forEach(cellIndex => {
-                const td = document.createElement('td');
-                let cellContent = row[cellIndex];
+        try {
+            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            let count = 0; // Initialize a counter for the number of rows
+            data.forEach((row, index) => {
+                if (index === 0) return; // Skip header row
+                count++; // Increment count for each row
+                const tr = document.createElement('tr');
+                
+                // Define the order of columns we want
+                // Name #1,Name #2,Event,Location,Stadt,Type,Year,Channel,Uploaded,URL,Views,ID,hidden
+                // 0 Name #1	1 Name #2	2 Event	3 Location	4 Stadt	5 Type	6 Year	7 Channel	8 Uploaded	9 URL	10 Views 11 ID 12 hidden
+                const columnOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                
+                columnOrder.forEach(cellIndex => {
+                    const td = document.createElement('td');
+                    let cellContent = row[cellIndex];
 
-                // Special handling for Views column
-                if (cellIndex === 10) {
-                    cellContent = parseInt(cellContent).toLocaleString();
-                }
+                    // Special handling for Views column
+                    if (cellIndex === 10) {
+                        cellContent = parseInt(cellContent).toLocaleString();
+                    }
 
-                // Special handling for URL column
-                if (cellIndex === 9) {
-                    // console.log("URL content:", cellContent);
-                    const URLtext = 'Link';
-                    // console.log("Setting link text to:", URLtext);
-                    td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
-                    // console.log("Resulting innerHTML:", td.innerHTML);
-                } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
-                    td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-                } else {
-                    td.textContent = cellContent;
-                }
+                    // Special handling for URL column
+                    if (cellIndex === 9) {
+                        // console.log("URL content:", cellContent);
+                        const URLtext = 'Link';
+                        // console.log("Setting link text to:", URLtext);
+                        td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+                        // console.log("Resulting innerHTML:", td.innerHTML);
+                    } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
+                        td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+                    } else {
+                        td.textContent = cellContent;
+                    }
 
-                tr.appendChild(td);
+                    tr.appendChild(td);
+                });
+
+                tableBody.appendChild(tr);
             });
-
-            tableBody.appendChild(tr);
-        });
-        document.getElementById('search-results').textContent = `Search results: ${count}`;
-        setTimeout(() => {
-            addYouTubeThumbnails();
-        }, 10);
+            document.getElementById('search-results').textContent = `Search results: ${count}`;
+            setTimeout(() => {
+                addYouTubeThumbnails();
+                }, 10);
+        }
+        catch (error) {
+            handleTableError(error);
+        }
     }
 
     // Function to sort data by uploaded date
@@ -130,20 +135,12 @@
             if (index === 0) return true; // Keep the header row
             return Object.entries(columnSearches).every(([column, searchText]) => {
                 const columnIndex = data[0].findIndex(header => 
-                    header.toLowerCase().trim() === column.toLowerCase().trim());
+                    header && header.toLowerCase().trim() === column.toLowerCase().trim());
                 if (columnIndex === -1) {
-                    // Try to find a similar column name
-                    const similarColumnIndex = data[0].findIndex(header => 
-                        header.toLowerCase().includes(column.toLowerCase()));
-                    if (similarColumnIndex !== -1) {
-                        console.log(`Column "${column}" not found, using similar column "${data[0][similarColumnIndex]}"`);
-                        columnIndex = similarColumnIndex;
-                    } else {
-                        console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
-                        return true; // Column not found, ignore this search
-                    }
+                    console.warn(`Column "${column}" not found. Ignoring this search criterion.`);
+                    return true; // Column not found, ignore this search
                 }
-                return row[columnIndex].toLowerCase().trim() === searchText.toLowerCase().trim();
+                return row[columnIndex] && row[columnIndex].toLowerCase().trim() === searchText.toLowerCase().trim();
             });
         });
     }
@@ -154,7 +151,6 @@
         console.log('Search Params:', searchParams);
         if (Object.keys(searchParams).length > 0) {
             currentData = searchTableByColumn(csvData, searchParams);
-            console.log('Filtered Data:', currentData);
             console.log('Filtered Data Length:', currentData.length);
             populateTable(currentData);
             updateUIWithAppliedFilters(searchParams);
@@ -165,16 +161,26 @@
         }
     }
 
+    function handleTableError(error) {
+        console.error('Error populating table:', error);
+        const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '<tr><td colspan="13">Error displaying data. Please try again later.</td></tr>';
+    }
+
     // Modify your fetchData function to call applyInitialFilters after data is loaded
     function fetchData(url) {
         return fetch(url)
             .then(response => response.text())
             .then(text => {
                 csvData = parseCSV(text);
-                console.log('CSV Data loaded:', csvData); // Log the loaded data
+                console.log('CSV Headers:', csvData[0]);
+                console.log('CSV Data loaded:', csvData.length, 'rows');
                 applyInitialFilters(); // Apply filters after data is loaded
             })
-            .catch(error => console.error('Error fetching the CSV file:', error));
+            .catch(error => {
+                console.error('Error fetching the CSV file:', error);
+                document.getElementById('data-table').innerHTML = '<tr><td>Error loading data. Please try again later.</td></tr>';
+            });
     }
     
 
