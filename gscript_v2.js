@@ -185,9 +185,15 @@
     
 
     function updateUIWithAppliedFilters(filters) {
-        const filterDisplay = document.getElementById('applied-filters') || createFilterDisplay();
-        filterDisplay.innerHTML = 'Applied Filters: ' + 
-            Object.entries(filters).map(([column, value]) => `${column}: ${value}`).join(', ');
+        const filterDisplay = document.getElementById('applied-filters');
+        if (Object.keys(filters).length > 0) {
+            filterDisplay.textContent = 'Applied Filters: ' + 
+                Object.entries(filters).map(([column, value]) => `${column}: ${value}`).join(', ');
+            filterDisplay.style.display = 'block';
+        } else {
+            filterDisplay.textContent = '';
+            filterDisplay.style.display = 'none';
+        }
     }
 
     function createFilterDisplay() {
@@ -217,6 +223,14 @@
             );
             populateTable(filteredData);
         });
+
+        // Ensure the applied-filters element exists
+        if (!document.getElementById('applied-filters')) {
+            const filterDisplay = document.createElement('div');
+            filterDisplay.id = 'applied-filters';
+            filterDisplay.className = 'info-text';
+            document.querySelector('.info-container').insertBefore(filterDisplay, document.getElementById('search-results'));
+        }
     
         document.getElementById('sort-uploaded').addEventListener('click', () => {
             const sortedData = sortDataByUploaded(currentData);

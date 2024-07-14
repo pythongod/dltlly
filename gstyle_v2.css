@@ -57,22 +57,45 @@ input#searchBox {
     margin-bottom: 10px;
 }
 
+.info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
 .info-text {
     font-size: 14px;
     color: #666;
-    margin: 5px 0;
-}
-
-#search-results {
-    text-align: left;
 }
 
 #last-updated {
-    text-align: right;
+    flex: 1;
+    text-align: left;
 }
 
 #applied-filters {
+    flex: 2;
+    text-align: center;
+}
+
+#search-results {
+    flex: 1;
     text-align: right;
+}
+
+@media (max-width: 768px) {
+    .info-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .info-text {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 5px;
+    }
 }
 
 .highlight {
