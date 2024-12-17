@@ -122,7 +122,7 @@ input#searchBox {
 #data-table th:nth-child(4), #data-table td:nth-child(4) { width: 10%; } /* Location */
 #data-table th:nth-child(5), #data-table td:nth-child(5) { width: 5%; } /* Stadt */
 #data-table th:nth-child(6), #data-table td:nth-child(6) { width: 7%; } /* Type */
-#data-table th:nth-child(7), #data-table td:nth-child(7) { width: 4%; } /* Year */
+#data-table th:nth-child(7), #data-table td:nth-child(7) { width: 4%; display: none; } /* Year */
 #data-table th:nth-child(8), #data-table td:nth-child(8) { width: 6%; } /* League */
 #data-table th:nth-child(9), #data-table td:nth-child(9) { width: 8.5%; } /* Uploaded */
 #data-table th:nth-child(10), #data-table td:nth-child(10) { width: 4%; } /* URL */
@@ -387,4 +387,8 @@ body.dark-mode .tooltip .tooltiptext {
         width: 200px;
         margin-left: -100px;
     }
+}
+
+#data-table th:nth-child(7), #data-table td:nth-child(7) {
+    display: none;
 }
