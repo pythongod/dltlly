@@ -348,26 +348,16 @@ function parseCSV(text) {
 // NEW VERSION
 function parseCSV(text) {
     const result = Papa.parse(text, {
-        header: false,           // We handle headers manually
-        skipEmptyLines: true,    // Ignore blank lines
-        dynamicTyping: false,    // Keep all as strings
-        trimHeaders: true,       // Remove whitespace from headers
-        trimFields: true,        // Remove whitespace from fields
-        delimiter: ',',          // Explicit comma delimiter
-        newline: '',            // Auto-detect line endings
-        quoteChar: '"',         // Standard CSV quotes
-        escapeChar: '"',        // Standard CSV escape
-        comments: false,        // No comment support needed
-        error: function(error) {
-            console.error('CSV Parsing Error:', error);
-        }
+        header: false,
+        skipEmptyLines: 'greedy',
+        dynamicTyping: false,
+        delimitersToGuess: [',', ';', '\t'],
+        worker: true,
+        transform: v => (typeof v === 'string' ? v.trim() : v)
     });
-    
-    // Handle parsing errors
-    if (result.errors.length > 0) {
-        console.warn('CSV Warnings:', result.errors);
+    if (result.errors && result.errors.length) {
+        console.warn('CSV parse issues (first 3):', result.errors.slice(0, 3));
     }
-    
     return result.data;
 }
 ```
@@ -525,31 +515,37 @@ function addYouTubeThumbnails() {
             console.error('Tooltip element not found');
             return;
         }
-        
-        const videoId = new URLSearchParams(new URL(link.href).search).get('v');
+
+        // Support youtube.com/watch?v=... and youtu.be/... forms
+        let videoId = null;
+        try {
+            const url = new URL(link.href);
+            if (url.hostname.includes('youtube.com')) {
+                videoId = new URLSearchParams(url.search).get('v');
+            } else if (url.hostname.includes('youtu.be')) {
+                videoId = url.pathname.replace('/', '').split('?')[0];
+            }
+        } catch (e) {
+            // noop
+        }
+
         if (!videoId) {
             tooltip.innerHTML = '<div style="padding: 10px;">Invalid YouTube URL</div>';
             return;
         }
-        
-        // Try maxresdefault first
-        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-        const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-        
+
+        const maxres = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        const fallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
         const img = new Image();
         img.onload = function() {
-            // Check if image is valid (maxresdefault returns 120x90 gray image if not available)
-            if (img.naturalWidth === 120 && img.naturalHeight === 90) {
-                img.src = fallbackUrl;
-            } else {
-                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%; height: auto; display: block;">`;
-            }
+            const urlToUse = (img.naturalWidth === 120 && img.naturalHeight === 90) ? fallback : maxres;
+            tooltip.innerHTML = `<img src="${urlToUse}" alt="Video Thumbnail" style="width: 100%; height: auto; display: block;">`;
         };
         img.onerror = function() {
-            // Fallback to hqdefault
-            tooltip.innerHTML = `<img src="${fallbackUrl}" alt="Video Thumbnail" style="width: 100%; height: auto; display: block;">`;
+            tooltip.innerHTML = `<img src="${fallback}" alt="Video Thumbnail" style="width: 100%; height: auto; display: block;">`;
         };
-        img.src = thumbnailUrl;
+        img.src = maxres;
     }
 }
 ```
@@ -1190,6 +1186,44 @@ test_*.html
 
 ---
 
+### ✅ **Fix 1.7: Debounce Search Input**
+
+**Timeline:** 30 minutes  
+**Difficulty:** Easy  
+**Impact:** MEDIUM - Smooth typing, fewer reflows
+
+```javascript
+// Debounce utility
+function debounce(fn, ms = 200) {
+    let timeoutId = null;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), ms);
+    };
+}
+
+// Usage in DOMContentLoaded
+const searchBox = document.getElementById('searchBox');
+if (searchBox) {
+    searchBox.addEventListener('input', debounce(Search.handleSearch, 200));
+}
+```
+
+---
+
+### ✅ **Fix 1.8: Accessibility Baseline**
+
+**Timeline:** 45 minutes  
+**Difficulty:** Easy  
+**Impact:** MEDIUM - Better a11y and usability
+
+Checklist:
+- Add `scope="col"` to table header `<th>` elements.
+- Ensure visible focus states (already in CSS, verify contrast ≥ 3:1).
+- Add `aria-pressed` to toggle buttons (e.g., dark mode, filters) and keep it in sync.
+- Provide a skip link at top of page: `<a class="skip-link" href="#data-table">Skip to results</a>`.
+- Use `toLocaleString('de-DE')` for number formatting where relevant.
+
 ## 📋 PRIORITY 2: Code Consolidation (Week 2, ~12-16 hours)
 
 ### ✅ **Fix 2.1: Consolidate CSS Files**
@@ -1216,11 +1250,9 @@ diff gstyle.css gstyle_v2.css > css_diff_v2.txt
 **Step 2: Create Unified CSS Structure**
 ```
 styles/
-├── base.css          # Core styles used by all pages
-├── components.css    # Reusable components (buttons, table, etc.)
-├── themes.css        # Light/dark mode
-├── pages.css         # Page-specific overrides
-└── responsive.css    # Media queries
+├── base.css          # Core styles used by all pages (variables, layout, typography)
+├── components.css    # Reusable components (buttons, table, tooltips, footer)
+└── responsive.css    # Media queries, accessibility helpers
 ```
 
 **Step 3: Create `styles/base.css`**
@@ -2577,7 +2609,8 @@ Create `docs/JS_ARCHITECTURE.md` documenting the new structure.
     "vite": "^5.0.0",
     "eslint": "^8.55.0",
     "stylelint": "^16.0.0",
-    "stylelint-config-standard": "^36.0.0"
+    "stylelint-config-standard": "^36.0.0",
+    "papaparse": "^5.4.1"
   },
   "dependencies": {}
 }
@@ -2596,7 +2629,6 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: 'terser',
     
     rollupOptions: {
       input: {
@@ -2661,64 +2693,44 @@ export default defineConfig({
 
 const fs = require('fs');
 const path = require('path');
+const Papa = require('papaparse');
 
 const CSV_PATH = path.join(__dirname, '../data/battle_events.csv');
 
 function validateCSV() {
     console.log('🔍 Validating CSV file...\n');
-    
+
     if (!fs.existsSync(CSV_PATH)) {
         console.error('❌ CSV file not found:', CSV_PATH);
         process.exit(1);
     }
-    
+
     const content = fs.readFileSync(CSV_PATH, 'utf-8');
-    const lines = content.split('\n').filter(line => line.trim());
-    
-    console.log(`📊 Total rows: ${lines.length}`);
-    console.log(`📊 Data rows: ${lines.length - 1}\n`);
-    
-    // Check headers
-    const headers = lines[0].split(',');
+    const result = Papa.parse(content, { header: true, skipEmptyLines: 'greedy' });
+
+    if (result.errors && result.errors.length) {
+        console.warn('⚠️ Parse warnings (first 5):', result.errors.slice(0, 5));
+    }
+
+    const rows = result.data || [];
+    const headers = result.meta && result.meta.fields ? result.meta.fields : [];
+
+    console.log(`📊 Total rows (including header): ${rows.length + 1}`);
+    console.log(`📊 Data rows: ${rows.length}\n`);
+
     const expectedHeaders = [
-        'Name #1', 'Name #2', 'Event', 'Type', 'Year', 
-        'Channel', 'Uploaded', 'URL', 'ID', 'Views'
+        'Name #1','Name #2','Event','Location','Stadt','Type','Year','League','Uploaded','URL','Views','ID','hidden'
     ];
-    
-    const headerCheck = expectedHeaders.every(h => 
-        headers.some(header => header.trim() === h)
-    );
-    
+
+    const headerCheck = expectedHeaders.every(h => headers.includes(h));
     if (!headerCheck) {
-        console.warn('⚠️  Headers may be incorrect');
-        console.log('Expected:', expectedHeaders.join(', '));
+        console.warn('⚠️ Headers may be incorrect');
+        console.log('Expected subset:', expectedHeaders.join(', '));
         console.log('Got:', headers.join(', '));
     } else {
-        console.log('✅ Headers are correct');
+        console.log('✅ Headers contain expected columns');
     }
-    
-    // Check for inconsistent column counts
-    const headerCount = headers.length;
-    let inconsistentRows = 0;
-    
-    lines.slice(1).forEach((line, index) => {
-        const columns = line.split(',').length;
-        if (columns !== headerCount) {
-            inconsistentRows++;
-            if (inconsistentRows <= 5) {
-                console.warn(`⚠️  Row ${index + 2}: ${columns} columns (expected ${headerCount})`);
-            }
-        }
-    });
-    
-    if (inconsistentRows > 5) {
-        console.warn(`⚠️  ... and ${inconsistentRows - 5} more rows with issues`);
-    }
-    
-    if (inconsistentRows === 0) {
-        console.log('✅ All rows have consistent column counts');
-    }
-    
+
     console.log('\n✅ Validation complete');
 }
 
@@ -2731,11 +2743,6 @@ validateCSV();
   command = "npm run build"
   publish = "dist"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
 [build.environment]
   NODE_VERSION = "18"
 
@@ -2746,11 +2753,19 @@ validateCSV();
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    # CSP tuned for this site
+    Content-Security-Policy = "default-src 'self'; connect-src 'self' plausible.jkl.ink; img-src 'self' data: https://img.youtube.com https://i.ytimg.com; script-src 'self' 'unsafe-inline' plausible.jkl.ink cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; frame-src https://www.youtube.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=()"
 
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=120"
 ```
 
 **Step 7: Usage**
@@ -2870,6 +2885,8 @@ npm run deploy
 3. ✅ Fix duplicate event listeners (1 hour)
 4. ✅ Add error messages (1 hour)
 5. ✅ Fix column display (1 hour)
+6. ✅ Add search debounce (30 min)
+7. ✅ Add basic accessibility baseline (45 min)
 
 ---
 
