@@ -7,6 +7,10 @@ function parseCSV(text) {
     return text.split('\n').map(row => row.split(','));
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // 0 Name #1, 1 Name #2,2 Event,3 Type, 4Year, 5 Channel, 6 Uploaded, 7 URL, 8 ID, 9 Views
 // Function to populate the table with data
 function populateTable(data, searchText = '') {
@@ -21,19 +25,20 @@ function populateTable(data, searchText = '') {
             if (cellIndex === 8) return; // Skip the ID column
 
             const td = document.createElement('td');
-
-            if (cellIndex === 9) { // Correct this to match the 'Views' column if indices changed
-                td.textContent = parseInt(cell).toLocaleString();
-            } else if (searchText && cell.toLowerCase().includes(searchText.toLowerCase())) {
-                td.innerHTML = cell.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
-            } else {
-                td.textContent = cell;
-            }
+            const cellValue = cell == null ? '' : String(cell);
 
             if (cellIndex === 7) { // Correct this if the indices shift due to column removal
                 const URL = `${row[7]}`;
                 const URLtext = 'Link';
                 td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+            } else if (cellIndex === 9) { // Views column
+                const parsedViews = parseInt(cellValue, 10);
+                td.textContent = Number.isNaN(parsedViews) ? cellValue : parsedViews.toLocaleString();
+            } else if (searchText && cellValue.toLowerCase().includes(searchText.toLowerCase())) {
+                const highlightRegex = new RegExp(escapeRegExp(searchText), 'gi');
+                td.innerHTML = cellValue.replace(highlightRegex, match => `<span class="highlight">${match}</span>`);
+            } else {
+                td.textContent = cellValue;
             }
 
             if (cellIndex < 10) {
@@ -165,10 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const sortedData = sortDataByViews(currentData, isAscending);
         populateTable([currentData[0], ...sortedData]);
-    });
-
-    searchBox.addEventListener('input', () => {
-        searchTable(csvData, searchBox.value);
     });
 
     document.querySelectorAll('.data-source-btn').forEach(btn => {

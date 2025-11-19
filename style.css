@@ -268,3 +268,8 @@ body.dark-mode footer {
     visibility: visible;
     opacity: 1;
 }
+
+#data-table tr:nth-child(-n+3) .tooltip .tooltiptext {
+    bottom: auto;
+    top: calc(100% + 6px);
+}

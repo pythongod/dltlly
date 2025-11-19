@@ -240,7 +240,8 @@ body.dark-mode #data-table td:nth-child(2):hover::after {
 
 #data-table tr:nth-child(-n+3) .tooltip .tooltiptext {
     bottom: auto;
-    top: 100%;
+    top: calc(100% + 6px);
+    margin-bottom: 0;
 }
 
 #sort-views {
