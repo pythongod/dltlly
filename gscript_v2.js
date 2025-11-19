@@ -9,6 +9,10 @@
         return text.split('\n').map(row => row.split(','));
     }
 
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
     function populateTable(data, searchText = '') {
         try {
             const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
@@ -26,22 +30,20 @@
                 
                 columnOrder.forEach(cellIndex => {
                     const td = document.createElement('td');
-                    let cellContent = row[cellIndex];
+                    const rawValue = row[cellIndex] == null ? '' : String(row[cellIndex]);
+                    let cellContent = rawValue;
 
-                    // Special handling for Views column
                     if (cellIndex === 10) {
-                        cellContent = parseInt(cellContent).toLocaleString();
+                        const parsedViews = parseInt(rawValue, 10);
+                        cellContent = Number.isNaN(parsedViews) ? rawValue : parsedViews.toLocaleString();
                     }
 
-                    // Special handling for URL column
                     if (cellIndex === 9) {
-                        // console.log("URL content:", cellContent);
                         const URLtext = 'Link';
-                        // console.log("Setting link text to:", URLtext);
                         td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
-                        // console.log("Resulting innerHTML:", td.innerHTML);
                     } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
-                        td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+                        const highlightRegex = new RegExp(escapeRegExp(searchText), 'gi');
+                        td.innerHTML = cellContent.replace(highlightRegex, match => `<span class="highlight">${match}</span>`);
                     } else {
                         td.textContent = cellContent;
                     }
@@ -145,19 +147,70 @@
         });
     }
 
+    function getColumnSearchesFromURL() {
+        const params = parseURLParams();
+        const headerRow = csvData[0] || [];
+        const normalizedHeaders = headerRow.map(header =>
+            header ? header.toLowerCase().trim() : ''
+        );
+
+        return Object.entries(params).reduce((acc, [key, value]) => {
+            if (key.toLowerCase().trim() === 'search') {
+                return acc;
+            }
+            const normalizedKey = key.toLowerCase().trim();
+            if (normalizedHeaders.includes(normalizedKey)) {
+                acc[key] = value;
+            }
+            return acc;
+        }, {});
+    }
+
+    function getGlobalSearchFromURL() {
+        const params = parseURLParams();
+        return params.search || '';
+    }
+
+    function filterData(columnSearches, globalSearchTerm = '') {
+        let filteredData = Object.keys(columnSearches).length > 0
+            ? searchTableByColumn(csvData, columnSearches)
+            : csvData;
+
+        if (globalSearchTerm) {
+            const normalizedTerm = globalSearchTerm.toLowerCase();
+            filteredData = filteredData.filter((row, index) => {
+                if (index === 0) return true;
+                return row.some(cell => {
+                    if (cell == null) {
+                        return false;
+                    }
+                    return String(cell).toLowerCase().includes(normalizedTerm);
+                });
+            });
+        }
+
+        return filteredData;
+    }
+
+    function applyFilters(globalSearchTerm = '') {
+        const columnSearches = getColumnSearchesFromURL();
+        const filteredData = filterData(columnSearches, globalSearchTerm);
+        currentData = filteredData;
+        populateTable(filteredData, globalSearchTerm);
+        updateUIWithAppliedFilters({
+            ...columnSearches,
+            ...(globalSearchTerm ? { Global: globalSearchTerm } : {})
+        });
+    }
+
     // Modify the applyInitialFilters function
     function applyInitialFilters() {
-        const searchParams = parseURLParams();
-        console.log('Search Params:', searchParams);
-        if (Object.keys(searchParams).length > 0) {
-            currentData = searchTableByColumn(csvData, searchParams);
-            console.log('Filtered Data Length:', currentData.length);
-            populateTable(currentData);
-            updateUIWithAppliedFilters(searchParams);
-            document.getElementById('searchBox').value = Object.values(searchParams).join(' ');
-        } else {
-            currentData = csvData;
-            populateTable(csvData);
+        const initialGlobalSearch = getGlobalSearchFromURL();
+        applyFilters(initialGlobalSearch);
+
+        const searchBox = document.getElementById('searchBox');
+        if (searchBox) {
+            searchBox.value = initialGlobalSearch;
         }
     }
 
@@ -186,9 +239,13 @@
 
     function updateUIWithAppliedFilters(filters) {
         const filterDisplay = document.getElementById('applied-filters');
-        if (Object.keys(filters).length > 0) {
+        if (!filterDisplay) {
+            return;
+        }
+        const activeFilters = Object.entries(filters).filter(([, value]) => value);
+        if (activeFilters.length > 0) {
             filterDisplay.textContent = 'Applied Filters: ' + 
-                Object.entries(filters).map(([column, value]) => `${column}: ${value}`).join(', ');
+                activeFilters.map(([column, value]) => `${column}: ${value}`).join(', ');
             filterDisplay.style.display = 'block';
         } else {
             filterDisplay.textContent = '';
@@ -216,13 +273,11 @@
     // Combined DOMContentLoaded event listener
     document.addEventListener('DOMContentLoaded', function() {
         const searchBox = document.getElementById('searchBox');
-        searchBox.addEventListener('input', () => {
-            const searchTerm = searchBox.value.toLowerCase();
-            const filteredData = currentData.filter(row => 
-                row.some(cell => cell.toLowerCase().includes(searchTerm))
-            );
-            populateTable(filteredData);
-        });
+        if (searchBox) {
+            searchBox.addEventListener('input', () => {
+                applyFilters(searchBox.value);
+            });
+        }
 
         // Ensure the applied-filters element exists
         if (!document.getElementById('applied-filters')) {
@@ -246,20 +301,6 @@
     
             const sortedData = sortDataByViews(currentData, isAscending);
             populateTable([currentData[0], ...sortedData]);
-        });
-    
-        searchBox.addEventListener('input', () => {
-            const globalSearchTerm = searchBox.value;
-            const columnSearches = parseURLParams();
-            let filteredData = columnSearches.league ? 
-                searchTableByColumn(csvData, columnSearches) : 
-                csvData;
-            filteredData = filteredData.filter(row => 
-                row.some(cell => cell.toLowerCase().includes(globalSearchTerm.toLowerCase()))
-            );
-            currentData = filteredData;
-            populateTable(filteredData);
-            updateUIWithAppliedFilters({...columnSearches, 'Global': globalSearchTerm});
         });
     
         // Initial fetch from the local Google Sheet CSV file
@@ -333,6 +374,9 @@
 
 
     function applyFilter(filter) {
-        document.getElementById('searchBox').value = filter;
-        searchTable(csvData, filter);
+        const searchBox = document.getElementById('searchBox');
+        if (searchBox) {
+            searchBox.value = filter;
+        }
+        applyFilters(filter);
     }

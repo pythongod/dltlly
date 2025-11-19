@@ -8,6 +8,10 @@ function parseCSV(text) {
     return text.split('\n').map(row => row.split(','));
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function populateTable(data, searchText = '') {
     const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
@@ -23,19 +27,20 @@ function populateTable(data, searchText = '') {
         
         columnOrder.forEach(cellIndex => {
             const td = document.createElement('td');
-            let cellContent = row[cellIndex];
+            const rawValue = row[cellIndex] == null ? '' : String(row[cellIndex]);
+            let cellContent = rawValue;
 
-            // Special handling for Views column
             if (cellIndex === 9) {
-                cellContent = parseInt(cellContent).toLocaleString();
+                const parsedViews = parseInt(rawValue, 10);
+                cellContent = Number.isNaN(parsedViews) ? rawValue : parsedViews.toLocaleString();
             }
 
-            // Special handling for URL column
             if (cellIndex === 7) {
                 const URLtext = 'Link';
                 td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
             } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
-                td.innerHTML = cellContent.replace(new RegExp(searchText, 'gi'), match => `<span class="highlight">${match}</span>`);
+                const highlightRegex = new RegExp(escapeRegExp(searchText), 'gi');
+                td.innerHTML = cellContent.replace(highlightRegex, match => `<span class="highlight">${match}</span>`);
             } else {
                 td.textContent = cellContent;
             }

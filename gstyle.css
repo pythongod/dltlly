@@ -301,3 +301,7 @@ body.dark-mode .tooltip .tooltiptext {
     border-color: #555;
 }
 
+#data-table tr:nth-child(-n+3) .tooltip .tooltiptext {
+    bottom: auto;
+    top: calc(100% + 6px);
+}
