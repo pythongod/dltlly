@@ -1,5 +1,6 @@
 body {
     background-color: #f8f9fb;
+    color: #111;
 }
 
 .stats-container {
@@ -32,6 +33,46 @@ body {
 
 .stats-section {
     margin-bottom: 2.5rem;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.copy-btn {
+    padding: 0.35rem 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.copy-btn:hover {
+    background: #111;
+    color: #fff;
+}
+
+.copy-btn-error {
+    background: #a94442;
+    color: #fff;
+}
+
+.copy-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .stats-table {
@@ -103,4 +144,45 @@ body {
     .year-section table {
         font-size: 0.9rem;
     }
+}
+
+body.dark-mode {
+    background-color: #111;
+    color: #f1f1f1;
+}
+
+body.dark-mode .stats-section {
+    background-color: #1b1b1b;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem 1.25rem;
+}
+
+body.dark-mode .stats-table th,
+body.dark-mode .year-section th {
+    background-color: #232323;
+    color: #f1f1f1;
+}
+
+body.dark-mode .stats-table td,
+body.dark-mode .year-section td {
+    border-color: #333;
+}
+
+body.dark-mode .year-section {
+    background: #1b1b1b;
+    border-color: #333;
+}
+
+body.dark-mode .copy-btn {
+    background: #222;
+    color: #eee;
+    border-color: #444;
+}
+
+body.dark-mode .copy-btn:hover {
+    background: #444;
+}
+
+body.dark-mode .battle-link a {
+    color: #77b7ff;
 }

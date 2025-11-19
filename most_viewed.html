@@ -17,12 +17,19 @@
                 <p class="subtitle">Top performers based on battle views from 2010 onwards.</p>
             </div>
             <div class="nav-buttons">
+                <button id="stats-dark-mode" class="filter-btn">Dark Mode</button>
                 <button class="filter-btn" onclick="window.location.href='index.html'">Back to Database</button>
             </div>
         </header>
 
         <section class="stats-section">
-            <h2>Top 10 MCs by Total Views</h2>
+            <div class="section-heading">
+                <h2>Top 10 MCs by Total Views</h2>
+                <div class="table-actions">
+                    <button class="copy-btn" data-copy-target="top-mc" data-copy-format="plain">Copy</button>
+                    <button class="copy-btn" data-copy-target="top-mc" data-copy-format="reddit">Copy Reddit</button>
+                </div>
+            </div>
             <table class="stats-table">
                 <thead>
                     <tr>
@@ -39,7 +46,9 @@
         </section>
 
         <section class="stats-section">
-            <h2>Top 10 Battles per Year (2010+)</h2>
+            <div class="section-heading">
+                <h2>Top 10 Battles per Year (2010+)</h2>
+            </div>
             <div id="yearly-sections" class="yearly-sections">
                 <p>Loading yearly breakdown…</p>
             </div>
