@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rap Battle DB – Most Viewed</title>
+    <script defer data-domain="battledb.xyz" src="https://plausible.jkl.ink/js/script.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="most_viewed.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+</head>
+<body>
+    <div class="container stats-container">
+        <header class="stats-header">
+            <div>
+                <h1>Most Viewed Battles & MCs</h1>
+                <p class="subtitle">Top performers based on battle views from 2010 onwards.</p>
+            </div>
+            <div class="nav-buttons">
+                <button class="filter-btn" onclick="window.location.href='index.html'">Back to Database</button>
+            </div>
+        </header>
+
+        <section class="stats-section">
+            <h2>Top 10 MCs by Total Views</h2>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>MC</th>
+                        <th>Total Views</th>
+                        <th>Battle Count</th>
+                    </tr>
+                </thead>
+                <tbody id="top-mc-body">
+                    <tr><td colspan="4">Loading data…</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="stats-section">
+            <h2>Top 10 Battles per Year (2010+)</h2>
+            <div id="yearly-sections" class="yearly-sections">
+                <p>Loading yearly breakdown…</p>
+            </div>
+        </section>
+    </div>
+    <script src="most_viewed.js"></script>
+</body>
+</html>
