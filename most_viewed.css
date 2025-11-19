@@ -166,6 +166,13 @@ body.dark-mode .year-section th {
 body.dark-mode .stats-table td,
 body.dark-mode .year-section td {
     border-color: #333;
+    background-color: #111;
+    color: #f1f1f1;
+}
+
+body.dark-mode .stats-table tbody tr:nth-child(even),
+body.dark-mode .year-section tbody tr:nth-child(even) {
+    background-color: #181818;
 }
 
 body.dark-mode .year-section {
