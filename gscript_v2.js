@@ -1,16 +1,14 @@
     let csvData = []; // Declare csvData to store the CSV data
     let currentData = []; // Data currently displayed (filtered or full dataset)
+    let activeLeague = '';
     // The premise is that your Google Sheet is published publicly. This is not intuitive for many folks. (Choose File -> Publish to Web...) Datei -> freigeben
     const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCSU0I6H0UdK-smWWr5t1X97dnYMst2HXJ10UFLEzwt0_EnfAwGlxHhhhRbVYsZNUV7O98tBi5_vZT/pub?gid=1245526804&single=true&output=csv';
     const localGsheetCSVURL = '/data/gsheet_battle_events_v2.csv';
 
     // Function to parse CSV text into a 2D array
     function parseCSV(text) {
-        return text.split('\n').map(row => row.split(','));
-    }
-
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return text.split(/\r?\n/).map(row => row.split(','))
+            .filter(row => row.some(cell => cell.trim()));
     }
 
     function populateTable(data, searchText = '') {
@@ -39,13 +37,9 @@
                     }
 
                     if (cellIndex === 9) {
-                        const URLtext = 'Link';
-                        td.innerHTML = `<a href="${cellContent}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
-                    } else if (searchText && cellContent.toLowerCase().includes(searchText.toLowerCase())) {
-                        const highlightRegex = new RegExp(escapeRegExp(searchText), 'gi');
-                        td.innerHTML = cellContent.replace(highlightRegex, match => `<span class="highlight">${match}</span>`);
+                        BattleTable.appendLink(td, cellContent, 'Link', true);
                     } else {
-                        td.textContent = cellContent;
+                        BattleTable.highlight(td, cellContent, searchText);
                     }
 
                     tr.appendChild(td);
@@ -54,9 +48,7 @@
                 tableBody.appendChild(tr);
             });
             document.getElementById('search-results').textContent = `Search results: ${count}`;
-            setTimeout(() => {
-                addYouTubeThumbnails();
-                }, 10);
+            addYouTubeThumbnails();
         }
         catch (error) {
             handleTableError(error);
@@ -115,9 +107,8 @@
 
     // Function to fetch the latest Google Sheet data
     function fetchOnlineData() {
-        fetchData(googleSheetURL)
+        return fetchData(googleSheetURL)
             .then(() => {
-                populateTable(csvData);
                 console.log('Table updated with latest Google Sheets data.');
             })
             .catch(error => console.error('Failed to load Google Sheets data.', error));
@@ -127,7 +118,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const searchParams = {};
         for (const [key, value] of urlParams) {
-            searchParams[key] = decodeURIComponent(value);
+            searchParams[key] = value;
         }
         return searchParams;
     }
@@ -189,7 +180,7 @@
             });
         }
 
-        return filteredData;
+        return BattleTable.filterLeague(filteredData, activeLeague);
     }
 
     function applyFilters(globalSearchTerm = '') {
@@ -199,19 +190,9 @@
         populateTable(filteredData, globalSearchTerm);
         updateUIWithAppliedFilters({
             ...columnSearches,
+            ...(activeLeague ? { League: activeLeague } : {}),
             ...(globalSearchTerm ? { Global: globalSearchTerm } : {})
         });
-    }
-
-    // Modify the applyInitialFilters function
-    function applyInitialFilters() {
-        const initialGlobalSearch = getGlobalSearchFromURL();
-        applyFilters(initialGlobalSearch);
-
-        const searchBox = document.getElementById('searchBox');
-        if (searchBox) {
-            searchBox.value = initialGlobalSearch;
-        }
     }
 
     function handleTableError(error) {
@@ -220,7 +201,7 @@
         tableBody.innerHTML = '<tr><td colspan="13">Error displaying data. Please try again later.</td></tr>';
     }
 
-    // Modify your fetchData function to call applyInitialFilters after data is loaded
+    // Reapply the active search and column filters after loading fresh data.
     function fetchData(url) {
         return fetch(url)
             .then(response => response.text())
@@ -228,7 +209,7 @@
                 csvData = parseCSV(text);
                 console.log('CSV Headers:', csvData[0]);
                 console.log('CSV Data loaded:', csvData.length, 'rows');
-                applyInitialFilters(); // Apply filters after data is loaded
+                applyFilters(document.getElementById('searchBox').value);
             })
             .catch(error => {
                 console.error('Error fetching the CSV file:', error);
@@ -274,6 +255,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const searchBox = document.getElementById('searchBox');
         if (searchBox) {
+            searchBox.value = getGlobalSearchFromURL();
             searchBox.addEventListener('input', () => {
                 applyFilters(searchBox.value);
             });
@@ -289,7 +271,7 @@
     
         document.getElementById('sort-uploaded').addEventListener('click', () => {
             const sortedData = sortDataByUploaded(currentData);
-            populateTable([currentData[0], ...sortedData]);
+            populateTable([currentData[0], ...sortedData], searchBox.value);
         });
     
         document.getElementById('sort-views').addEventListener('click', () => {
@@ -300,7 +282,7 @@
             header.classList.toggle('desc', isAscending);
     
             const sortedData = sortDataByViews(currentData, isAscending);
-            populateTable([currentData[0], ...sortedData]);
+            populateTable([currentData[0], ...sortedData], searchBox.value);
         });
     
         // Initial fetch from the local Google Sheet CSV file
@@ -309,9 +291,9 @@
         });
 
 
-        document.querySelectorAll('.filter-btn').forEach(btn => {
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
             btn.addEventListener('click', function() {
-                applyFilter(this.getAttribute('data-filter'));
+                applyFilter(this.getAttribute('data-filter'), this.getAttribute('data-filter-column'));
             });
         });
 
@@ -335,48 +317,16 @@
 
     // Function to add YouTube thumbnails on hover
     function addYouTubeThumbnails() {
-        document.querySelector('#data-table').addEventListener('mouseover', function(event) {
-            const link = event.target.closest('a.tooltip[href*="youtube.com/watch"]');
-            if (!link) return;
-
-            if (link.dataset.thumbnailAdded) return;
-            link.dataset.thumbnailAdded = 'true';
-
-            const tooltip = link.querySelector('.tooltiptext');
-            if (!tooltip) {
-                console.error('Tooltip element not found or incorrect for link:', link);
-                return;
-            }
-
-            link.addEventListener('mouseenter', function() {
-                const videoId = new URLSearchParams(new URL(this.href).search).get('v');
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                
-                const img = new Image();
-                img.onload = function() {
-                    // console.log('Thumbnail loaded');
-                    tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Video Thumbnail" style="width: 100%; height: auto;">`;
-                };
-                img.onerror = function() {
-                    console.log('Thumbnail load failed, trying hqdefault');
-                    // Fallback to hqdefault if maxresdefault is not available
-                    const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                    tooltip.innerHTML = `<img src="${fallbackUrl}" alt="Video Thumbnail" style="width: 100%; height: auto;">`;
-                };
-                img.src = thumbnailUrl;
-            });
-
-            link.addEventListener('mouseleave', function() {
-                this.querySelector('.tooltiptext').innerHTML = '';
-            });
-        });
+        BattleTable.addThumbnails(document.getElementById('data-table'));
     }
 
-
-    function applyFilter(filter) {
+    function applyFilter(filter, column) {
         const searchBox = document.getElementById('searchBox');
-        if (searchBox) {
+        if (column === 'Channel') {
+            activeLeague = filter;
+        } else {
+            activeLeague = '';
             searchBox.value = filter;
         }
-        applyFilters(filter);
+        applyFilters(searchBox.value);
     }

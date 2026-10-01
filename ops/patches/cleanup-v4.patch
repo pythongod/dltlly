@@ -1,0 +1,43 @@
+--- a/cleanup-v4.py
++++ b/cleanup-v4.py
+@@ -257,6 +257,14 @@
+     logger.info(f"Processed new data: {df_corrected.shape}")
+     return df_corrected
+ 
++def sheet_view_count(value):
++    """Represent missing YouTube counts as empty cells, preserving zero."""
++    number = pd.to_numeric(value, errors='coerce')
++    if pd.isna(number) or not 0 <= number < float('inf'):
++        return ''
++    return int(number)
++
++
+ def update_google_sheets(df_new):
+     """Update Google Sheets with new data."""
+     # Authorize and initialize the Google Sheets client
+@@ -288,7 +296,7 @@
+                 uploaded_date,
+                 row['URL'],
+                 row['ID'],
+-                int(row['Views']) if pd.notna(row['Views']) else ''
++                sheet_view_count(row['Views'])
+             ]
+             new_rows.append(row_data)
+ 
+@@ -345,7 +353,7 @@
+                 row['Channel'],
+                 uploaded_date,
+                 row['URL'],
+-                int(row['Views']) if pd.notna(row['Views']) else '',
++                sheet_view_count(row['Views']),
+                 row['ID'],
+                 row['Event'] # formerly event)
+             ]
+@@ -404,6 +412,7 @@
+         logger.info(f"CSV files saved at: {OUTPUT_FILE_PATH} and {OUTPUT_FILE_PATH_HISTORY}")
+     except Exception as e:
+         logger.error("An error occurred during processing: %s", e)
++        raise
+ 
+ if __name__ == "__main__":
+     main()

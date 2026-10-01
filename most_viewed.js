@@ -20,17 +20,26 @@ function parseCSV(text) {
     return text
         .trim()
         .split('\n')
-        .map(row => row.split(','));
+        .map(row => row.split(','))
+        .filter(row => row.some(cell => cell.trim()));
 }
 
 function formatNumber(num) {
     return num.toLocaleString();
 }
 
+// A "+ Interview" suffix denotes a battle with an additional interview.
+function isBattle(row) {
+    const event = String(row[EVENT_INDEX] || '');
+    if (/\b(teaser|trailer|promo(?:tion(?:al)?)?)\b/i.test(event)) return false;
+    return !/\binterview\b/i.test(event) || /(?:\+|&|\band\b|\bund\b)\s*interview\b/i.test(event);
+}
+
 function computeTopMCs(rows) {
     const totals = new Map();
 
     rows.forEach(row => {
+        if (!isBattle(row)) return;
         const views = parseInt(row[VIEWS_INDEX], 10);
         if (Number.isNaN(views)) {
             return;
@@ -43,10 +52,11 @@ function computeTopMCs(rows) {
             if (!trimmed) {
                 return;
             }
-            const entry = totals.get(trimmed) || { name: trimmed, views: 0, battles: 0 };
+            const key = trimmed.toLowerCase();
+            const entry = totals.get(key) || { name: trimmed, views: 0, battles: 0 };
             entry.views += views;
             entry.battles += 1;
-            totals.set(trimmed, entry);
+            totals.set(key, entry);
         });
     });
 
@@ -59,6 +69,7 @@ function computeYearlyTopBattles(rows) {
     const byYear = new Map();
 
     rows.forEach(row => {
+        if (!isBattle(row)) return;
         const year = parseInt(row[YEAR_INDEX], 10);
         const views = parseInt(row[VIEWS_INDEX], 10);
         if (Number.isNaN(year) || Number.isNaN(views) || year < START_YEAR) {
@@ -102,12 +113,11 @@ function renderTopMCs(mcs) {
 
     mcs.forEach((mc, index) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${mc.name}</td>
-            <td>${formatNumber(mc.views)}</td>
-            <td>${mc.battles}</td>
-        `;
+        [index + 1, mc.name, formatNumber(mc.views), mc.battles].forEach(value => {
+            const td = document.createElement('td');
+            td.textContent = value;
+            tr.appendChild(td);
+        });
         tbody.appendChild(tr);
     });
 }
@@ -115,14 +125,15 @@ function renderTopMCs(mcs) {
 function createBattleRow(battle, rank) {
     const tr = document.createElement('tr');
     const matchup = `${battle.mc1} vs ${battle.mc2}`;
-    tr.innerHTML = `
-        <td>${rank}</td>
-        <td>${matchup}</td>
-        <td>${battle.event || ''}</td>
-        <td>${battle.league || ''}</td>
-        <td>${formatNumber(battle.views)}</td>
-        <td class="battle-link"><a href="${battle.url}" target="_blank" rel="noopener">Watch</a></td>
-    `;
+    [rank, matchup, battle.event || '', battle.league || '', formatNumber(battle.views)].forEach(value => {
+        const td = document.createElement('td');
+        td.textContent = value;
+        tr.appendChild(td);
+    });
+    const linkCell = document.createElement('td');
+    linkCell.className = 'battle-link';
+    BattleTable.appendLink(linkCell, battle.url, 'Watch');
+    tr.appendChild(linkCell);
     return tr;
 }
 

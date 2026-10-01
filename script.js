@@ -1,14 +1,12 @@
 let csvData = []; // Declare csvData to store the CSV data
 let currentData = []; // Data currently displayed (filtered or full dataset)
+let activeLeague = '';
 const localCSVURL = '/data/battle_events.csv';
 
 // Function to parse CSV text into a 2D array
 function parseCSV(text) {
-    return text.split('\n').map(row => row.split(','));
-}
-
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.split(/\r?\n/).map(row => row.split(','))
+        .filter(row => row.some(cell => cell.trim()));
 }
 
 // 0 Name #1, 1 Name #2,2 Event,3 Type, 4Year, 5 Channel, 6 Uploaded, 7 URL, 8 ID, 9 Views
@@ -28,17 +26,12 @@ function populateTable(data, searchText = '') {
             const cellValue = cell == null ? '' : String(cell);
 
             if (cellIndex === 7) { // Correct this if the indices shift due to column removal
-                const URL = `${row[7]}`;
-                const URLtext = 'Link';
-                td.innerHTML = `<a href="${URL}" target="_blank" class="tooltip">${URLtext}<div class="tooltiptext"></div></a>`;
+                BattleTable.appendLink(td, row[7], 'Link', true);
             } else if (cellIndex === 9) { // Views column
                 const parsedViews = parseInt(cellValue, 10);
                 td.textContent = Number.isNaN(parsedViews) ? cellValue : parsedViews.toLocaleString();
-            } else if (searchText && cellValue.toLowerCase().includes(searchText.toLowerCase())) {
-                const highlightRegex = new RegExp(escapeRegExp(searchText), 'gi');
-                td.innerHTML = cellValue.replace(highlightRegex, match => `<span class="highlight">${match}</span>`);
             } else {
-                td.textContent = cellValue;
+                BattleTable.highlight(td, cellValue, searchText);
             }
 
             if (cellIndex < 10) {
@@ -82,7 +75,7 @@ function sortDataByViews(data, isAscending) {
 
 // Function to search within the table
 function searchTable(data, searchText) {
-    const filteredData = data.filter((row, index) => {
+    const filteredData = BattleTable.filterLeague(data, activeLeague).filter((row, index) => {
         if (index === 0) return true;
         return row.some((cell) => cell.toLowerCase().includes(searchText.toLowerCase()));
     });
@@ -120,11 +113,7 @@ function fetchData(url, searchText = '', updateTable = true) {
                 csvData = data;
                 currentData = data;
                 if (updateTable) {
-                    if (searchText) {
-                        searchTable(data, searchText);
-                    } else {
-                        populateTable(data);
-                    }
+                    searchTable(data, document.getElementById('searchBox').value);
                 }
             } else {
                 throw new Error('No data found');
@@ -157,8 +146,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const initialSource = getUrlParameter('source') || 'local-csv';
 
     document.getElementById('sort-uploaded').addEventListener('click', () => {
-        const sortedData = sortDataByUploaded(csvData);
-        populateTable([csvData[0], ...sortedData]);
+        const sortedData = sortDataByUploaded(currentData);
+        populateTable([currentData[0], ...sortedData], searchBox.value);
     });
 
     document.getElementById('sort-views').addEventListener('click', () => {
@@ -169,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         header.classList.toggle('desc', isAscending);
 
         const sortedData = sortDataByViews(currentData, isAscending);
-        populateTable([currentData[0], ...sortedData]);
+        populateTable([currentData[0], ...sortedData], searchBox.value);
     });
 
     document.querySelectorAll('.data-source-btn').forEach(btn => {
@@ -193,9 +182,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchBox.value = searchText;
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
         btn.addEventListener('click', function() {
-            applyFilter(this.getAttribute('data-filter'));
+            applyFilter(this.getAttribute('data-filter'), this.getAttribute('data-filter-column'));
         });
     });
 
@@ -212,26 +201,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add YouTube thumbnails on hover
 function addYouTubeThumbnails() {
-    const youtubeLinks = document.querySelectorAll('td a[href*="youtube.com/watch"]');
-
-    youtubeLinks.forEach(link => {
-        const tooltip = link.querySelector('.tooltiptext');
-
-        link.addEventListener('mouseover', function() {
-            const videoId = new URLSearchParams(new URL(link.href).search).get('v');
-            if (videoId) {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                tooltip.innerHTML = `<img src="${thumbnailUrl}" alt="Thumbnail" style="width: 100%;">`;
-            }
-        });
-
-        link.addEventListener('mouseleave', function() {
-            tooltip.innerHTML = ''; // Clear the tooltip content
-        });
-    });
+    BattleTable.addThumbnails(document.getElementById('data-table'));
 }
 
-function applyFilter(filter) {
-    document.getElementById('searchBox').value = filter;
-    searchTable(csvData, filter);
+function applyFilter(filter, column) {
+    const searchBox = document.getElementById('searchBox');
+    if (column === 'Channel') {
+        activeLeague = filter;
+    } else {
+        activeLeague = '';
+        searchBox.value = filter;
+    }
+    searchTable(csvData, searchBox.value);
 }
