@@ -4,9 +4,9 @@
 https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas?project=api-project-1034072798907
 
 
-https://battledb.xyz/
+Live site: https://glittering-praline-452e49.netlify.app/
 
-https://glittering-praline-452e49.netlify.app/ 
+Custom domains are retired for now; Netlify is the primary address.
 
 https://googlesheets--glittering-praline-452e49.netlify.app/
 
