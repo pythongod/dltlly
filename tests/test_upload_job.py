@@ -21,10 +21,10 @@ exit 0
 ''')
                 executable.chmod(0o755)
             log = directory / 'commands'
-            env = dict(os.environ, BATTLEDB_REPO=folder, BATTLEDB_GETDATA=folder,
+            env = dict(os.environ, BATTLEDB_REPO=folder, BATTLEDB_GETDATA=folder, BATTLEDB_PYTHON='python3',
                        PATH=folder + os.pathsep + os.environ['PATH'], TEST_COMMANDS=str(log),
                        TEST_FAILURE=failure, TEST_CHANGED='1' if changed else '0')
-            result = subprocess.run(['bash', str(SCRIPT)], env=env, capture_output=True)
+            result = subprocess.run(['bash', str(SCRIPT), '--locked'], env=env, capture_output=True)
             return result.returncode, log.read_text().splitlines()
 
     def test_pull_failure_stops_before_external_writes(self):

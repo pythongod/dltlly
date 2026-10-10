@@ -17,11 +17,7 @@ let topMCCache = [];
 let yearlyBattleCache = [];
 
 function parseCSV(text) {
-    return text
-        .trim()
-        .split('\n')
-        .map(row => row.split(','))
-        .filter(row => row.some(cell => cell.trim()));
+    return BattleTable.parseCSV(text);
 }
 
 function formatNumber(num) {
@@ -30,6 +26,8 @@ function formatNumber(num) {
 
 // A "+ Interview" suffix denotes a battle with an additional interview.
 function isBattle(row) {
+    const category = String(row[10] || '').trim().toLowerCase();
+    if (['battle', 'interview', 'promo', 'other'].includes(category)) return category === 'battle';
     const event = String(row[EVENT_INDEX] || '');
     if (/\b(teaser|trailer|promo(?:tion(?:al)?)?)\b/i.test(event)) return false;
     return !/\binterview\b/i.test(event) || /(?:\+|&|\band\b|\bund\b)\s*interview\b/i.test(event);
