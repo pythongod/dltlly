@@ -15,6 +15,9 @@ const BattleTable = {
             if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
         }
         history.replaceState(null, '', url);
+        document.querySelectorAll('a[data-navigation]').forEach(link => {
+            link.href = this.navigationURL(link.dataset.navigation);
+        });
         document.querySelectorAll('[data-filter-column="Channel"]').forEach(button => {
             button.setAttribute('aria-pressed', String(button.dataset.filter === league));
         });

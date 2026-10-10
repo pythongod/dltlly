@@ -313,3 +313,16 @@ for (const [page, script, csv] of [pages[0], pages[2]]) {
         assert.equal(stats.searchParams.get('search'),'High');
     });
 }
+
+for (const [page, script, csv] of [pages[0], pages[2]]) {
+    test(`${script}: information link href carries the return context without inline JavaScript`, async t => {
+        const app = await load(t,page,script,csv,'?category=all&league=DLTLLY',csvFixture(script==='gscript_v2.js',[{Channel:'DLTLLY'}]));
+        search(app,'Shizu');
+        const link = app.document.querySelector('.footer-link');
+        const target = new URL(link.href);
+        assert.equal(target.searchParams.get('search'),'Shizu');
+        assert.equal(target.searchParams.get('returnTo'),page);
+        assert.equal(target.searchParams.get('league'),'DLTLLY');
+        assert.equal(link.getAttribute('onclick'),null);
+    });
+}
