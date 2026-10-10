@@ -2,12 +2,16 @@
 set -euo pipefail
 
 cd "${BATTLEDB_REPO:-$HOME/git/dltlly}"
-getdata_dir=${BATTLEDB_GETDATA:-$HOME/dltlly/getdata}
+python=${BATTLEDB_PYTHON:-$HOME/.local/share/battledb/venv/bin/python}
+[[ -x "$python" ]] || python=python3
+if [[ ${1:-} != --locked ]]; then
+    exec "$python" -m ops.ingestion.storage "${BATTLEDB_STATE:-$HOME/.local/state/battledb}/job.lock" bash "$0" --locked
+fi
 
 git pull --ff-only
-python3 "$getdata_dir/get_ytb_data_v4.py"
-python3 "$getdata_dir/cleanup-v4.py"
-python3 "$getdata_dir/updateviewcount_v3.py"
+"$python" -m ops.ingestion.run --apply --job-lock-held --repo "$PWD" \
+    --legacy "${BATTLEDB_GETDATA:-$HOME/dltlly/getdata}" \
+    --state "${BATTLEDB_STATE:-$HOME/.local/state/battledb}"
 git add -- data info.yml
 if ! git diff --cached --quiet; then
     git commit -m 'Update battle data and timestamps'

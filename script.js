@@ -5,8 +5,7 @@ const localCSVURL = '/data/battle_events.csv';
 
 // Function to parse CSV text into a 2D array
 function parseCSV(text) {
-    return text.split(/\r?\n/).map(row => row.split(','))
-        .filter(row => row.some(cell => cell.trim()));
+    return BattleTable.parseCSV(text);
 }
 
 // 0 Name #1, 1 Name #2,2 Event,3 Type, 4Year, 5 Channel, 6 Uploaded, 7 URL, 8 ID, 9 Views
@@ -19,7 +18,7 @@ function populateTable(data, searchText = '') {
         if (index === 0) return; // Skip header row
         count++; // Increment count for each row
         const tr = document.createElement('tr');
-        row.forEach((cell, cellIndex) => {
+        row.slice(0, 10).forEach((cell, cellIndex) => {
             if (cellIndex === 8) return; // Skip the ID column
 
             const td = document.createElement('td');
@@ -34,9 +33,7 @@ function populateTable(data, searchText = '') {
                 BattleTable.highlight(td, cellValue, searchText);
             }
 
-            if (cellIndex < 10) {
-                tr.appendChild(td);
-            }
+            tr.appendChild(td);
         });
         tableBody.appendChild(tr);
     });

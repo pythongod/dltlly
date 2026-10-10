@@ -6,8 +6,7 @@ const localGsheetCSVURL = '/data/gsheet_battle_events.csv';
 
 // Function to parse CSV text into a 2D array
 function parseCSV(text) {
-    return text.split(/\r?\n/).map(row => row.split(','))
-        .filter(row => row.some(cell => cell.trim()));
+    return BattleTable.parseCSV(text);
 }
 
 function populateTable(data, searchText = '') {

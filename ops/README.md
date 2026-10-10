@@ -1,47 +1,95 @@
-# Scheduled updater
+# Scheduled ingestion
 
-The ingestion Python files live outside this website repository. The patches in
-`patches/` record the reviewed changes without copying credentials into Git.
-Apply them from the ingestion directory with `patch -p1`, after backing up the
-original files and checking `patch --dry-run -p1`.
+`ops/ingestion/` is the versioned Python replacement for the three legacy LXC
+scripts. Python 3.12 is the production runtime. The old scripts and their
+embedded keys remain in `/home/jack/dltlly/getdata`; credentials remain in
+`/home/jack/git/dltlly/service_account_credentials.json`. The replacement reads
+literal settings through AST, without importing or executing those scripts.
+Do not commit credentials, private configuration, or run journals.
 
-- `cleanup-v4.patch`: tolerate missing view counts and propagate failures.
-- `updateviewcount-v3.patch`: update only changed Views cells; never clear the
-  worksheet or rewrite curated columns and formulas.
-- `update-git-upload-v3.sh`: stop on failures, fast-forward pulls only, and skip
-  empty commits while still retrying an outstanding push.
-- `run-update.sh`: preserve pipeline failures, capture stderr, and send one
-  healthcheck and one notification after a successful update.
+## Install and run
 
-The cron wrapper reads `$HOME/.config/battledb/cron.env` (directory mode 700,
-file mode 600). Configure these shell variables there, keeping real endpoints
-outside Git:
+Create an isolated environment and install the complete dependency lock:
 
-```
-BATTLEDB_UPDATER=/path/to/update-git-upload-v3.sh
-BATTLEDB_TIMESTAMP=/path/to/timestamp.sh
-BATTLEDB_LOG=/path/to/cron.log
-BATTLEDB_HEALTHCHECK_WEEKDAY=https://example.invalid/weekday
-BATTLEDB_HEALTHCHECK_SUNDAY=https://example.invalid/sunday
-BATTLEDB_NOTIFY_URL=https://example.invalid/notify
+```sh
+python3 -m venv --without-pip "$HOME/.local/share/battledb/venv"
+python3 -m pip --python "$HOME/.local/share/battledb/venv/bin/python" install -r ops/ingestion/requirements.lock
+cd "$HOME/git/dltlly"
+"$HOME/.local/share/battledb/venv/bin/python" -m ops.ingestion.run --historical
 ```
 
-Keep the existing cron schedules and replace their command with the absolute
-path to `run-update.sh`. Install both shell files as executable. Repository
-push authentication uses a repository-scoped SSH deploy key; private keys and
-known-host configuration stay outside Git. Branch protection is unchanged.
+The default is read-only for Sheets and published data. It saves a private
+before/after review under `$HOME/.local/state/battledb/runs/<UTC timestamp>/`.
+Review `changes.json`, `proposed.json`, `rejected.json`, and `summary.json`.
+Private `before.json` retains generated rows and the two Sheet snapshots.
 
-## Tests
+After reviewing a historical repair, add `--apply --historical`. This marks
+only newly appended Sheet rows as `skipped historical backfill`; existing
+`Processed` values and curator fields remain untouched. No CLI ingestion
+command invokes Telegram, webhooks, or healthchecks. Routine scheduled runs
+use `--apply` without `--historical`, allowing genuinely new rows to notify.
 
-```
-npm ci
+## Collection and recovery
+
+Every run scans all pages of the configured uploads and curated playlists.
+Video details supply publication dates; playlist insertion dates are ignored.
+Identity is the video ID, including when two battles have identical metadata.
+Optional missing fields preserve known data. Missing/private videos remain in
+the primary CSV with `Availability=unavailable`. Supporting videos carry an
+explicit `Content category`; rankings include only battles. Uncertain new
+parses go to the private rejected-record journal for inspection.
+
+Transient YouTube requests retry at most four times; exhausted/permanent
+failures abort. Both Sheet schemas are checked before mutation. Reconciliation
+uses header-based RAW writes and video IDs. Existing differing nonempty
+metadata is preserved and reported as conflicts; new-layout Event, Location,
+Stadt, and Processed are never overwritten. A second snapshot detects changes
+before writing. Human edits during the final API call cannot be locked by the
+Sheets API, so avoid sorting/editing while a repair is running.
+
+An interrupted write leaves `pending.json` with the original baseline and
+historical flag. Rerunning reads fresh Sheet IDs and does not blindly repeat
+an append. An acknowledged append with a lost response therefore reconciles
+without duplicating rows. A metadata change during recovery can conservatively
+appear as a curator conflict; inspect that conflict rather than forcing it.
+
+CSV files and history are written atomically after metadata and Views are
+synchronized, with `info.yml` last. Each file is atomic individually; Git
+publishes the full set together. A filesystem failure can leave local files
+from different generations until recovery. `last-success.json` advances only
+after all exports succeed. Run journals and backups are private and are not
+staged for publication.
+
+## Cron wrappers
+
+`update-git-upload-v3.sh` obtains a process lock over pull, ingestion, commit,
+and push. It stops on failure, uses fast-forward pulls, and retries an outstanding
+push even when there is no new commit. `run-update.sh` captures stderr and
+pipeline failures, invokes the existing notification trigger once, then reports
+success to the healthcheck. Notification triggers have no automatic retry.
+
+The unchanged private `$HOME/.config/battledb/cron.env` supplies the updater,
+timestamp, log, healthcheck endpoints, and notification endpoint. Install the
+versioned scripts to its existing configured paths after backing them up. Keep
+the existing cron schedule. `BATTLEDB_REPO`, `BATTLEDB_GETDATA`, `BATTLEDB_STATE`,
+and `BATTLEDB_PYTHON` are optional non-secret overrides.
+
+## Validation and rollback
+
+```sh
+npm ci --ignore-scripts
 npm test
-python3 tests/test_cron.py
-python3 tests/test_upload_job.py
+python3 -m unittest discover -s tests
 ```
 
-Run `tests/test_updater.py` as the ingestion service user with its existing
-Python environment (`pandas` and `gspread` installed). Set
-`BATTLEDB_UPDATER_DIR` when the ingestion directory differs from the test's
-default. Tests load only the relevant functions and use fake external-service
-boundaries; they do not write live Sheets, push commits, or send notifications.
+The legacy `test_updater.py` regressions run only where the preserved scripts
+and their pandas/gspread dependencies exist; the replacement tests need no
+Google credentials and use fake boundaries. LXC validation runs both sets.
+
+Before production repair, preserve the live Git revision, published CSVs,
+wrappers, and private Sheet snapshots. To roll back code, restore the backed-up
+wrappers and revert the repair commit through Git. Restore data from the private
+backup only after comparing current Sheet edits; never replace curator or
+Processed cells wholesale. Historical rows already marked skipped must stay
+skipped. The legacy patches in `patches/` are retained for reference, not applied
+by the new scheduler.

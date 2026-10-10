@@ -200,3 +200,50 @@ test('statistics: imported names and event fields stay literal and unsafe links 
     assert.equal(row.cells[2].textContent, payload);
     assert.equal(row.querySelectorAll('img, [onerror], a').length, 0);
 });
+
+for (const [page, script, csv] of [...pages, ['most_viewed.html', 'most_viewed.js', 'battle_events.csv']]) {
+    test(`${script}: CSV quotes preserve commas, line breaks and literal double quotes`, async t => {
+        const app = await load(t, page, script, csv);
+        const parsed = app.window.parseCSV('\uFEFFName,Event,Views\r\n"Artist, One","Berlin\r\nThe ""Final""",12\r\nPlain,"single\nline",0\r\n\r\n , , \r\n');
+        assert.deepEqual(Array.from(parsed, row => Array.from(row)), [
+            ['Name', 'Event', 'Views'],
+            ['Artist, One', 'Berlin\r\nThe "Final"', '12'],
+            ['Plain', 'single\nline', '0']
+        ]);
+        assert.deepEqual(Array.from(app.window.parseCSV('a,b\r1,2\r'), row => Array.from(row)), [['a', 'b'], ['1', '2']]);
+    });
+}
+
+test('primary: appended ingestion metadata does not add table cells', async t => {
+    const header = 'Name #1,Name #2,Event,Type,Year,Channel,Uploaded,URL,ID,Views,Content category,Availability';
+    const fixture = header + '\n"Artist, One",Other,"Berlin\nFinal",Accapella,2026,DLTLLY,2026-01-01,https://www.youtube.com/watch?v=J0qDMBdgcGM,J0qDMBdgcGM,1234,battle,available\n';
+    const app = await load(t, 'index.html', 'script.js', 'battle_events.csv', '', fixture);
+    const rendered = rows(app.document);
+    assert.equal(rendered.length, 1);
+    assert.equal(rendered[0].cells.length, 9);
+    assert.equal(rendered[0].cells[0].textContent, 'Artist, One');
+    assert.equal(rendered[0].cells[2].textContent, 'Berlin\nFinal');
+    assert.equal(rendered[0].cells[8].textContent, (1234).toLocaleString());
+    assert.equal(rendered[0].cells[7].querySelector('a').href, 'https://www.youtube.com/watch?v=J0qDMBdgcGM');
+});
+
+test('statistics: explicit content categories determine eligibility before legacy event heuristics', async t => {
+    const app = await load(t, 'most_viewed.html', 'most_viewed.js');
+    const entries = [
+        ['battle', 'Interview Arena', true],
+        ['interview', 'Berlin', false],
+        ['promo', 'Berlin', false],
+        ['other', 'Berlin', false],
+        [' Battle ', 'Trailer Event', true],
+        ['Berlin', 'Battle', true],
+        ['Berlin', 'Interview', false]
+    ];
+    const data = entries.map(([category, Event, expected]) => {
+        const row = rowFixture(false, { Event })[1];
+        row[10] = category;
+        assert.equal(app.window.isBattle(row), expected);
+        return row;
+    });
+    assert.equal(app.window.computeTopMCs(data)[0].battles, 3);
+    assert.equal(app.window.computeYearlyTopBattles(data)[0].battles.length, 3);
+});

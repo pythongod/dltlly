@@ -14,5 +14,6 @@ if [[ $(date +%u) == 7 ]]; then
 else
     healthcheck_url=$BATTLEDB_HEALTHCHECK_WEEKDAY
 fi
+# Trigger once: a lost response must not blindly resend an external action.
+curl -fsS -m 10 -o /dev/null "$BATTLEDB_NOTIFY_URL"
 curl -fsS -m 10 --retry 5 -o /dev/null "$healthcheck_url"
-curl -fsS -m 10 --retry 5 -o /dev/null "$BATTLEDB_NOTIFY_URL"

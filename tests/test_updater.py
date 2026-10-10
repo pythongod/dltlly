@@ -11,8 +11,11 @@ from pathlib import Path
 import types
 import unittest
 
-import pandas as pd
-from gspread.utils import a1_to_rowcol, rowcol_to_a1
+try:
+    import pandas as pd
+    from gspread.utils import a1_to_rowcol, rowcol_to_a1
+except ImportError:
+    pd = None
 
 
 SOURCE = Path(os.environ.get('BATTLEDB_UPDATER_DIR', '/home/jack/dltlly/getdata'))
@@ -73,6 +76,7 @@ def client_for(sheet):
     return types.SimpleNamespace(open_by_url=lambda _: types.SimpleNamespace(worksheet=lambda _: sheet))
 
 
+@unittest.skipUnless(pd is not None and (SOURCE / 'updateviewcount_v3.py').exists(), 'Legacy LXC regression tests require the preserved scripts and pandas/gspread')
 class ViewUpdateTests(unittest.TestCase):
     def run_update(self, sheet, details):
         functions = load_functions('updateviewcount_v3.py')
@@ -103,6 +107,7 @@ class ViewUpdateTests(unittest.TestCase):
         self.assertEqual(sheet.rows, original)
 
 
+@unittest.skipUnless(pd is not None and (SOURCE / 'cleanup-v4.py').exists(), 'Legacy LXC regression tests require the preserved scripts and pandas/gspread')
 class CleanupTests(unittest.TestCase):
     def test_cleanup_exception_reaches_caller(self):
         def fail(_):

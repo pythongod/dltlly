@@ -1,5 +1,44 @@
 // Imported CSV values must stay text, including search highlights and URLs.
 const BattleTable = {
+    parseCSV(text) {
+        const rows = [];
+        let row = [];
+        let cell = '';
+        let quoted = false;
+        const source = String(text).replace(/^\uFEFF/, '');
+        const finishRow = () => {
+            row.push(cell);
+            if (row.some(value => value.trim())) rows.push(row);
+            row = [];
+            cell = '';
+        };
+        for (let index = 0; index < source.length; index++) {
+            const char = source[index];
+            if (quoted) {
+                if (char === '"' && source[index + 1] === '"') {
+                    cell += '"';
+                    index++;
+                } else if (char === '"') {
+                    quoted = false;
+                } else {
+                    cell += char;
+                }
+            } else if (char === '"' && cell === '') {
+                quoted = true;
+            } else if (char === ',') {
+                row.push(cell);
+                cell = '';
+            } else if (char === '\r' || char === '\n') {
+                finishRow();
+                if (char === '\r' && source[index + 1] === '\n') index++;
+            } else {
+                cell += char;
+            }
+        }
+        finishRow();
+        return rows;
+    },
+
     highlight(element, value, searchText = '') {
         const text = String(value ?? '');
         if (!searchText) {
