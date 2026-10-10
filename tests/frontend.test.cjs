@@ -247,3 +247,69 @@ test('statistics: explicit content categories determine eligibility before legac
     assert.equal(app.window.computeTopMCs(data)[0].battles, 3);
     assert.equal(app.window.computeYearlyTopBattles(data)[0].battles.length, 3);
 });
+
+for (const [page, script, csv] of [pages[0], pages[2]]) {
+    test(`${script}: natural matchup queries match both opponents in either order`, async t => {
+        const app = await load(t, page, script, csv, '', csvFixture(script === 'gscript_v2.js', [
+            {'Name #1':'Mikesh', 'Name #2':'Kato'}, {'Name #1':'Mikesh','Name #2':'Other'}
+        ]));
+        for (const query of ['Mikesh Kato','kato vs. MIKESH','  Mikesh   vs Kato  ']) {
+            search(app, query);
+            assert.equal(rows(app.document).length, 1);
+            assert.equal(rows(app.document)[0].cells[1].textContent, 'Kato');
+        }
+        search(app, 'nobody nowhere');
+        assert.equal(rows(app.document).length, 0);
+        assert.equal(app.document.getElementById('empty-results').hidden, false);
+    });
+}
+
+for (const [page, script, csv] of [pages[0], pages[2]]) {
+    test(`${script}: category selector excludes interviews by default and can reveal them`, async t => {
+        const v2 = script === 'gscript_v2.js';
+        const header = [...rowFixture(v2)[0], 'Content category'];
+        const fixture = [header, [...rowFixture(v2, {Event:'Battle'})[1], 'battle'], [...rowFixture(v2, {Event:'Interview'})[1], 'interview']].map(r=>r.join(',')).join('\n');
+        const app = await load(t,page,script,csv,'',fixture);
+        assert.equal(rows(app.document).length,1);
+        const selector = app.document.getElementById('content-category');
+        selector.value='interview';selector.dispatchEvent(new app.window.Event('change'));
+        assert.equal(rows(app.document).length,1);
+        assert.match(rows(app.document)[0].textContent,/Interview/);
+        selector.value='all';selector.dispatchEvent(new app.window.Event('change'));
+        assert.equal(rows(app.document).length,2);
+    });
+}
+
+test('curated event fallback uses IDs and never replaces manual fields or mutates source rows', async t => {
+    const app = await load(t,'gindex_v2.html','gscript_v2.js','gsheet_battle_events_v2.csv','',csvFixture(true,[{}]));
+    const curated = [['ID','Event','Location','Stadt'],['one','','',''],['two','Manual event','Manual venue','Manual city']];
+    const imported = [['ID','Event','Content category'],['two','Imported event','battle'],['one','Frankfurt','battle']];
+    const before = JSON.stringify(curated);
+    app.window.curatedFixture = curated; app.window.importedFixture = imported;
+    const enriched = app.window.eval('BattleTable.enrichCurated(curatedFixture, importedFixture)');
+    assert.equal(enriched[1][1],'Frankfurt');
+    assert.equal(enriched[2][1],'Manual event');
+    assert.equal(enriched[2][2],'Manual venue');
+    assert.equal(enriched[2][3],'Manual city');
+    assert.equal(enriched[1][2],'');
+    assert.equal(JSON.stringify(curated),before);
+});
+
+for (const [page, script, csv] of [pages[0], pages[2]]) {
+    test(`${script}: navigation serializes and restores query league category and sort`, async t => {
+        const app = await load(t,page,script,csv,'?search=Mikesh&league=DLTLLY&category=all&sort=views-asc',csvFixture(script==='gscript_v2.js',[
+            {'Name #1':'Mikesh','Name #2':'High',Channel:'DLTLLY',Views:'300'},
+            {'Name #1':'Mikesh','Name #2':'Low',Channel:'DLTLLY',Views:'100'},
+            {'Name #1':'Mikesh',Channel:'RAM',Views:'50'}
+        ]));
+        assert.deepEqual(rows(app.document).map(r=>r.cells[1].textContent),['Low','High']);
+        search(app,'High');
+        const params = new URL(app.window.location.href).searchParams;
+        assert.equal(params.get('search'),'High');
+        assert.equal(params.get('league'),'DLTLLY');
+        assert.equal(params.get('category'),'all');
+        const stats = new URL(app.window.eval("BattleTable.navigationURL('most_viewed.html')"));
+        assert.equal(stats.searchParams.get('returnTo'),page);
+        assert.equal(stats.searchParams.get('search'),'High');
+    });
+}

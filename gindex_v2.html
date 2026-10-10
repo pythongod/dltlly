@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Rap Battle DB - Google Sheet</title>
     <script defer data-domain="battledb.xyz" src="https://plausible.jkl.ink/js/script.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="gstyle_v2.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+    <link rel="stylesheet" href="table_responsive.css">
 </head>
 <body>
     <div class="container">
@@ -20,18 +22,23 @@
             <button class="filter-btn" data-filter="On Beat">On Beat</button>
             <button class="filter-btn" data-filter="">Reset</button>
             <button id="dark-mode-toggle" class="filter-btn">Dark Mode</button>
-            <button class="data-source-btn" data-source="local-csv" onclick="window.location.href='index.html'">Simple Version</button>
+            <button class="data-source-btn" data-source="local-csv" onclick="BattleTable.navigate('index.html')">All events</button>
             <button class="data-source-btn" data-source="google-sheet" onclick="fetchOnlineData()">&#8635;</button>      
             <button class="data-source-btn" data-source="local-csv" onclick="window.open('https://docs.google.com/spreadsheets/d/1Bi3UKWBt45cCUnTKHLlh5MhIFmF7D6F-TvggV0DyHlw','_blank')">GoTo GoogleSheet</button>    
-            <button class="data-source-btn" onclick="window.location.href='most_viewed.html'">MOST VIEWED</button>
+            <button class="data-source-btn" onclick="BattleTable.navigate('most_viewed.html')">MOST VIEWED</button>
             <!-- Add more filters as needed -->
         </div>
-        <input type="text" id="searchBox" placeholder="Search...">
+        <span class="select-control"><label for="content-category">Content</label>
+        <select id="content-category"><option value="battle">Battles</option><option value="interview">Interviews</option><option value="promo">Promos</option><option value="other">Other</option><option value="all">All videos</option></select></span>
+        <span class="select-control"><label for="sort-order">Sort</label>
+        <select id="sort-order"><option value="uploaded">Newest upload</option><option value="views-desc">Most views</option><option value="views-asc">Fewest views</option></select></span>
+        <input type="text" id="searchBox" placeholder="Search MCs or a matchup, e.g. Mikesh vs Kato" aria-label="Search battles">
         <div class="info-container">
             <div id="last-updated" class="info-text">Last updated: </div>
             <div id="applied-filters" class="info-text"></div>
             <div id="search-results" class="info-text">Search results: 0</div>
         </div>
+        <p id="empty-results" hidden>No matches. Try an MC name or clear your filters with Reset.</p>
         <table id="data-table">
             <thead>
                 <tr>
@@ -54,7 +61,7 @@
         </table>
         <footer>
             <div class="container">
-                <a href="subpage.html" class="footer-link">More Information</a>
+                <a href="subpage.html" onclick="BattleTable.navigate('subpage.html'); return false" class="footer-link">More Information</a>
             </div>
         </footer> 
     </div>

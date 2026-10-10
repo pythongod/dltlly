@@ -1,6 +1,7 @@
     let csvData = []; // Declare csvData to store the CSV data
     let currentData = []; // Data currently displayed (filtered or full dataset)
-    let activeLeague = '';
+    let activeLeague = new URLSearchParams(location.search).get('league') || '';
+    let importedData = [];
     // The premise is that your Google Sheet is published publicly. This is not intuitive for many folks. (Choose File -> Publish to Web...) Datei -> freigeben
     const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCSU0I6H0UdK-smWWr5t1X97dnYMst2HXJ10UFLEzwt0_EnfAwGlxHhhhRbVYsZNUV7O98tBi5_vZT/pub?gid=1245526804&single=true&output=csv';
     const localGsheetCSVURL = '/data/gsheet_battle_events_v2.csv';
@@ -41,12 +42,21 @@
                         BattleTable.highlight(td, cellContent, searchText);
                     }
 
+                    if (cellIndex === 2 && row.importedEvent) {
+                        const note = document.createElement('small');
+                        note.className = 'imported-event';
+                        note.textContent = 'From video title';
+                        td.appendChild(note);
+                    }
                     tr.appendChild(td);
                 });
 
+                BattleTable.categoryBadge(row, data[0], tr.cells[5]);
                 tableBody.appendChild(tr);
+                BattleTable.labelCells(tr);
             });
             document.getElementById('search-results').textContent = `Search results: ${count}`;
+            BattleTable.emptyState(count);
             addYouTubeThumbnails();
         }
         catch (error) {
@@ -83,7 +93,7 @@
     function searchTable(data, searchText) {
         const filteredData = data.filter((row, index) => {
             if (index === 0) return true;
-            return row.some(cell => cell.toLowerCase().includes(searchText.toLowerCase()));
+            return BattleTable.matches(row, searchText);
         });
         currentData = filteredData;
         const numResults = filteredData.length - 1;
@@ -170,21 +180,17 @@
             const normalizedTerm = globalSearchTerm.toLowerCase();
             filteredData = filteredData.filter((row, index) => {
                 if (index === 0) return true;
-                return row.some(cell => {
-                    if (cell == null) {
-                        return false;
-                    }
-                    return String(cell).toLowerCase().includes(normalizedTerm);
-                });
+                return BattleTable.matches(row, normalizedTerm);
             });
         }
 
-        return BattleTable.filterLeague(filteredData, activeLeague);
+        return BattleTable.filterCategory(BattleTable.filterLeague(filteredData, activeLeague));
     }
 
     function applyFilters(globalSearchTerm = '') {
         const columnSearches = getColumnSearchesFromURL();
-        const filteredData = filterData(columnSearches, globalSearchTerm);
+        const filteredData = BattleTable.sorted(filterData(columnSearches, globalSearchTerm));
+        BattleTable.saveState(globalSearchTerm, activeLeague);
         currentData = filteredData;
         populateTable(filteredData, globalSearchTerm);
         updateUIWithAppliedFilters({
@@ -205,7 +211,7 @@
         return fetch(url)
             .then(response => response.text())
             .then(text => {
-                csvData = parseCSV(text);
+                csvData = BattleTable.enrichCurated(parseCSV(text), importedData);
                 console.log('CSV Headers:', csvData[0]);
                 console.log('CSV Data loaded:', csvData.length, 'rows');
                 applyFilters(document.getElementById('searchBox').value);
@@ -253,8 +259,10 @@
     // Combined DOMContentLoaded event listener
     document.addEventListener('DOMContentLoaded', function() {
         const searchBox = document.getElementById('searchBox');
+        BattleTable.restoreControls();
         if (searchBox) {
             searchBox.value = getGlobalSearchFromURL();
+            document.getElementById('content-category').addEventListener('change', () => applyFilters(searchBox.value));
             searchBox.addEventListener('input', () => {
                 applyFilters(searchBox.value);
             });
@@ -268,26 +276,17 @@
             document.querySelector('.info-container').insertBefore(filterDisplay, document.getElementById('search-results'));
         }
     
-        document.getElementById('sort-uploaded').addEventListener('click', () => {
-            const sortedData = sortDataByUploaded(currentData);
-            populateTable([currentData[0], ...sortedData], searchBox.value);
-        });
-    
-        document.getElementById('sort-views').addEventListener('click', () => {
-            const header = document.getElementById('sort-views');
-            const isAscending = header.classList.contains('asc');
-            
-            header.classList.toggle('asc', !isAscending);
-            header.classList.toggle('desc', isAscending);
-    
-            const sortedData = sortDataByViews(currentData, isAscending);
-            populateTable([currentData[0], ...sortedData], searchBox.value);
-        });
+        BattleTable.bindSort(() => applyFilters(searchBox.value));
     
         // Initial fetch from the local Google Sheet CSV file
-        fetchData(localGsheetCSVURL).then(() => {
-            console.log('Data fetched and initial filters applied');
-        });
+        fetch('/data/battle_events.csv')
+            .then(response => {
+                if (!response.ok) throw new Error('Metadata unavailable');
+                return response.text();
+            })
+            .then(text => { importedData = parseCSV(text); })
+            .catch(error => console.warn(error))
+            .then(() => fetchData(localGsheetCSVURL));
 
 
         document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
@@ -321,6 +320,11 @@
 
     function applyFilter(filter, column) {
         const searchBox = document.getElementById('searchBox');
+        if (!filter) {
+            history.replaceState(null, '', location.pathname);
+            document.getElementById('content-category').value = 'battle';
+            document.getElementById('sort-order').value = 'uploaded';
+        }
         if (column === 'Channel') {
             activeLeague = filter;
         } else {
