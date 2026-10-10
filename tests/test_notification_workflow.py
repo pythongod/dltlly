@@ -2,6 +2,7 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +30,7 @@ class NotificationWorkflowTests(unittest.TestCase):
     def targets(self, name, output=0):
         return [edge['node'] for edge in self.fixed['connections'][name]['main'][output]]
 
+    @unittest.skipUnless(shutil.which('node'), 'Notification expression test requires Node.js; run on the development host')
     def test_html_escapes_imported_fields_and_preserves_underscore_url(self):
         telegram = self.nodes['Telegram']['parameters']
         self.assertEqual(telegram['additionalFields'].get('parse_mode'), 'HTML')

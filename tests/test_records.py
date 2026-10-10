@@ -90,6 +90,32 @@ class RecordsTests(unittest.TestCase):
         self.assertIsNone(parse_record(record('🏆 PPV OUT NOW - MIT TITLE MATCH STEEL VS. MORGANA, VYRUS, YUAH, REQUIEM UVM. | FOB')))
         self.assertIsNone(parse_record(record('01.06.24 #BIELEFELD 🎬 PPV Out Now! 🔥 Full Trailer 🔥 Neilz vs Davie Jones + 5 weitere Battles im PPV!')))
 
+    def test_real_versus_punctuation_and_one_rounder(self):
+        fixtures = [
+            ('LARA SOFT "vs." M.F.L. | ON BEAT BATTLE | FOB | 2024', 'LARA SOFT', 'M.F.L.'),
+            ('MC COLOGNE vs.TECEY | ON BEAT BATTLE | FOB | 2022', 'MC COLOGNE', 'TECEY'),
+            ('HARDRADA - ONE ROUNDER (VS APATUAL) | RAP BATTLE | FOB | EARLY ACCESS 4 MEMBER', 'HARDRADA', 'APATUAL'),
+        ]
+        for title, first, second in fixtures:
+            with self.subTest(title=title):
+                row = parse_record(record(title))
+                self.assertIsNotNone(row)
+                self.assertEqual((row['Name #1'], row['Name #2']), (first, second))
+                self.assertEqual(row['Content category'], 'battle')
+
+    def test_explicit_short_freestyle_battles_remain_battles(self):
+        fixtures = [
+            ('YAAMANN vs. TOMMY2LATE (BATTLE UM PLATZ 3) | FREESTYLE BATTLE | FOB | 2023', 161),
+            ('ZEPTAH vs. NOAH263 | FREESTYLE BATTLE | FOB | 2022', 124),
+            ('TEACH vs. VESSO | FREESTYLE BATTLE | FOB | 2022', 154),
+            ('Alice vs Bob | FREESTYLE RAP BATTLE', 150),
+        ]
+        for title, seconds in fixtures:
+            item = record(title); item['duration_seconds'] = seconds
+            self.assertEqual(parse_record(item)['Content category'], 'battle')
+        item = record('Alice vs Bob | KAMPFANSAGE'); item['duration_seconds'] = 150
+        self.assertEqual(parse_record(item)['Content category'], 'other')
+
     def test_dudl_episode_marker_ends_artist_name(self):
         row = parse_record(record('Mave vs Hörsturz D&DL#0058 (Halle // 2017)'))
         self.assertEqual(row['Name #2'], 'Hörsturz')

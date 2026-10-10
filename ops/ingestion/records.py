@@ -94,13 +94,15 @@ def parse_record(record):
         return None
     title = _text(record['title'])
     parts = _title_parts(title)
-    names = re.split(r'\s+vs\.?\s+', parts[0], flags=re.I)
+    one_rounder = re.fullmatch(r'(.+?)\s+-\s+ONE ROUNDER\s+\(VS\.?\s+([^()]+)\)\s*', parts[0], flags=re.I)
+    names = list(one_rounder.groups()) if one_rounder else re.split(r'\s+(?:"vs\.?"\s+|vs\.\s*|vs\s+)', parts[0], flags=re.I)
     if len(names) != 2:
         return None
     names = [_name(name) for name in names]
     if not all(names) or any(re.search(r'\b(?:PPV|Trailer|weitere Battles)\b|\d{2}\.\d{2}\.', name, re.I) for name in names):
         return None
-    category = 'other' if duration < 180 else 'battle'
+    explicit_freestyle = re.search(r'\bFREESTYLE (?:RAP )?BATTLE\b', title, re.I)
+    category = 'other' if duration < 180 and not explicit_freestyle else 'battle'
     if re.search(r'\b(?:quiz|reaction|reaktion|recap)\b', title, re.I):
         category = 'other'
     elif re.search(r'\b(?:trailer|teaser|promo|pressekonferenz|press conference|reveal|out now|ankündigung)\b', title, re.I):
