@@ -1,5 +1,118 @@
 // Imported CSV values must stay text, including search highlights and URLs.
 const BattleTable = {
+    restoreControls() {
+        const params = new URLSearchParams(location.search);
+        const category = document.getElementById('content-category');
+        if (category && ['battle','interview','promo','other','all'].includes(params.get('category'))) category.value = params.get('category');
+        const sort = document.getElementById('sort-order');
+        if (sort && ['uploaded','views-desc','views-asc'].includes(params.get('sort'))) sort.value = params.get('sort');
+    },
+
+    saveState(search, league) {
+        const url = new URL(location.href);
+        const values = {search, league, category: document.getElementById('content-category').value, sort: document.getElementById('sort-order').value};
+        for (const [key, value] of Object.entries(values)) {
+            if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
+        }
+        history.replaceState(null, '', url);
+        document.querySelectorAll('[data-filter-column="Channel"]').forEach(button => {
+            button.setAttribute('aria-pressed', String(button.dataset.filter === league));
+        });
+    },
+
+    sorted(data) {
+        const sort = document.getElementById('sort-order')?.value || 'uploaded';
+        const column = data[0]?.indexOf(sort === 'uploaded' ? 'Uploaded' : 'Views');
+        return [data[0], ...data.slice(1).sort((a, b) => {
+            if (sort === 'uploaded') return String(b[column] || '').localeCompare(String(a[column] || ''));
+            const x = Number.parseInt(a[column], 10), y = Number.parseInt(b[column], 10);
+            if (!Number.isFinite(x)) return Number.isFinite(y) ? 1 : 0;
+            if (!Number.isFinite(y)) return -1;
+            return sort === 'views-asc' ? x-y : y-x;
+        })];
+    },
+
+    navigationURL(page) {
+        const url = new URL(page, location.href);
+        url.search = location.search;
+        if (['most_viewed.html','subpage.html'].includes(page)) {
+            url.searchParams.set('returnTo', location.pathname.endsWith('gindex_v2.html') ? 'gindex_v2.html' : 'index.html');
+        } else url.searchParams.delete('returnTo');
+        return url.href;
+    },
+
+    navigate(page) { location.href = this.navigationURL(page); },
+
+    returnToDatabase() {
+        const params = new URLSearchParams(location.search);
+        this.navigate(params.get('returnTo') === 'gindex_v2.html' ? 'gindex_v2.html' : 'index.html');
+    },
+
+    bindSort(refresh) {
+        const select = document.getElementById('sort-order');
+        select.addEventListener('change', refresh);
+        document.getElementById('sort-uploaded').addEventListener('click', () => { select.value = 'uploaded'; refresh(); });
+        document.getElementById('sort-views').addEventListener('click', () => { select.value = select.value === 'views-desc' ? 'views-asc' : 'views-desc'; refresh(); });
+    },
+
+    category(row, headers) {
+        const value = String(row[headers.indexOf('Content category')] || '').trim().toLowerCase();
+        if (['battle', 'interview', 'promo', 'other'].includes(value)) return value;
+        const event = String(row[headers.indexOf('Event')] || '');
+        if (/\b(teaser|promo|trailer)\b/i.test(event)) return 'promo';
+        if (/\binterview\b/i.test(event) && !/(?:\+|&|\band\b|\bund\b)\s*interview\b/i.test(event)) return 'interview';
+        return 'battle';
+    },
+
+    filterCategory(data) {
+        const selected = document.getElementById('content-category')?.value || 'all';
+        return data.filter((row, index) => index === 0 || selected === 'all' || this.category(row, data[0]) === selected);
+    },
+
+    categoryBadge(row, headers, target) {
+        const badge = document.createElement('span');
+        badge.className = 'content-badge';
+        const category = this.category(row, headers);
+        badge.textContent = category[0].toUpperCase() + category.slice(1);
+        target.appendChild(badge);
+    },
+
+    enrichCurated(data, imported) {
+        if (!data.length || !imported.length) return data;
+        const headers = [...data[0]];
+        let categoryIndex = headers.indexOf('Content category');
+        if (categoryIndex < 0) categoryIndex = headers.push('Content category') - 1;
+        const importedById = new Map(imported.slice(1).filter(row => row[imported[0].indexOf('ID')]).map(row => [row[imported[0].indexOf('ID')], row]));
+        return [headers, ...data.slice(1).map(original => {
+            const row = [...original];
+            const source = importedById.get(row[headers.indexOf('ID')]);
+            if (!row[categoryIndex] && source) row[categoryIndex] = this.category(source, imported[0]);
+            const eventIndex = headers.indexOf('Event');
+            if (eventIndex >= 0 && !String(row[eventIndex] || '').trim() && source) {
+                row[eventIndex] = source[imported[0].indexOf('Event')] || '';
+                row.importedEvent = Boolean(row[eventIndex]);
+            }
+            return row;
+        })];
+    },
+
+    matches(row, query) {
+        const terms = String(query).toLowerCase().split(/\s+/).filter(term => term && !/^vs\.?$/.test(term));
+        return terms.every(term => row.some(cell => String(cell ?? '').toLowerCase().includes(term)));
+    },
+
+    emptyState(count) {
+        const notice = document.getElementById('empty-results');
+        if (notice) notice.hidden = count !== 0;
+    },
+
+    labelCells(row) {
+        const headers = document.querySelectorAll('#data-table th');
+        [...row.cells].forEach((cell, index) => {
+            cell.dataset.label = headers[index]?.textContent || '';
+        });
+    },
+
     parseCSV(text) {
         const rows = [];
         let row = [];
