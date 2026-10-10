@@ -9,7 +9,7 @@ if [[ ${1:-} != --locked ]]; then
 fi
 
 git pull --ff-only
-"$python" -m ops.ingestion.run --apply --repo "$PWD" \
+"$python" -m ops.ingestion.run --apply --job-lock-held --repo "$PWD" \
     --legacy "${BATTLEDB_GETDATA:-$HOME/dltlly/getdata}" \
     --state "${BATTLEDB_STATE:-$HOME/.local/state/battledb}"
 git add -- data info.yml

@@ -5,6 +5,7 @@ import json
 import os
 import sys
 from collections import Counter
+from contextlib import nullcontext
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -106,10 +107,12 @@ def main():
     parser.add_argument('--state', type=Path, default=Path.home() / '.local/state/battledb')
     parser.add_argument('--apply', action='store_true', help='Write Sheets and publish exports; default is dry-run')
     parser.add_argument('--historical', action='store_true', help='Mark NEW Sheet rows as skipped historical backfill')
+    parser.add_argument('--job-lock-held', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     os.umask(0o077)
     try:
-        with exclusive_lock(args.state / 'ingestion.lock'):
+        job_lock = nullcontext() if args.job_lock_held else exclusive_lock(args.state / 'job.lock')
+        with job_lock, exclusive_lock(args.state / 'ingestion.lock'):
             youtube, worksheets = clients(args.repo, args.legacy)
             run(args.repo, args.state, youtube, worksheets, apply=args.apply, historical=args.historical)
     except Exception as error:

@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from ops.ingestion.config import literal_settings
 from ops.ingestion.storage import atomic_write, exclusive_lock
-from ops.ingestion.run import run
+from ops.ingestion.run import run, main
 from ops.ingestion.records import COLUMN_ORDER
 from ops.ingestion.storage import csv_text
 
@@ -38,6 +38,14 @@ class MemorySheet:
 
 
 class IngestionRunTests(unittest.TestCase):
+    def test_direct_cli_cannot_overlap_locked_git_job(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with exclusive_lock(Path(directory) / 'job.lock'), \
+                 patch('sys.argv', ['ingestion', '--state', directory]), \
+                 patch('ops.ingestion.run.clients', side_effect=RuntimeError('must not connect')) as connect:
+                self.assertEqual(main(), 1)
+                connect.assert_not_called()
+
     def test_settings_never_execute_legacy_source(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'legacy.py'
