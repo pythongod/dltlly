@@ -22,7 +22,7 @@ function populateTable(data, searchText = '') {
             if (cellIndex === 8) return; // Skip the ID column
 
             const td = document.createElement('td');
-            const cellValue = cell == null ? '' : String(cell);
+            const cellValue = String(BattleTable.displayValue(row, data[0], cellIndex) ?? '');
 
             if (cellIndex === 7) { // Correct this if the indices shift due to column removal
                 BattleTable.appendLink(td, row[7], 'Link', true);
@@ -35,6 +35,7 @@ function populateTable(data, searchText = '') {
 
             tr.appendChild(td);
         });
+        BattleTable.compilationNote(row, data[0], tr.cells[0]);
         BattleTable.categoryBadge(row, data[0], tr.cells[3]);
         tableBody.appendChild(tr);
         BattleTable.labelCells(tr);
@@ -77,7 +78,7 @@ function sortDataByViews(data, isAscending) {
 function searchTable(data, searchText) {
     let filteredData = BattleTable.filterFormats(BattleTable.filterCategory(BattleTable.filterLeague(data, activeLeague))).filter((row, index) => {
         if (index === 0) return true;
-        return BattleTable.matches(row, searchText);
+        return BattleTable.matches(row, searchText, data[0]);
     });
     filteredData = BattleTable.sorted(filteredData);
     BattleTable.saveState(searchText, activeLeague);
