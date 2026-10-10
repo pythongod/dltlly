@@ -27,7 +27,8 @@ function formatNumber(num) {
 // A "+ Interview" suffix denotes a battle with an additional interview.
 function isBattle(row) {
     const category = String(row[10] || '').trim().toLowerCase();
-    if (['battle', 'interview', 'promo', 'other'].includes(category)) return category === 'battle';
+    if (/\bface[\s‐‑–-]*off\b/i.test(String(row[EVENT_INDEX] || ''))) return false;
+    if (['battle', 'faceoff', 'interview', 'promo', 'other'].includes(category)) return category === 'battle';
     const event = String(row[EVENT_INDEX] || '');
     if (/\b(teaser|trailer|promo(?:tion(?:al)?)?)\b/i.test(event)) return false;
     return !/\binterview\b/i.test(event) || /(?:\+|&|\band\b|\bund\b)\s*interview\b/i.test(event);
@@ -116,6 +117,7 @@ function renderTopMCs(mcs) {
             td.textContent = value;
             tr.appendChild(td);
         });
+        [...tr.cells].forEach((cell, index) => { cell.dataset.label = MC_HEADERS[index]; });
         tbody.appendChild(tr);
     });
 }
@@ -132,6 +134,7 @@ function createBattleRow(battle, rank) {
     linkCell.className = 'battle-link';
     BattleTable.appendLink(linkCell, battle.url, 'Watch');
     tr.appendChild(linkCell);
+    [...tr.cells].forEach((cell, index) => { cell.dataset.label = YEAR_HEADERS[index] === 'URL' ? 'Watch' : YEAR_HEADERS[index]; });
     return tr;
 }
 
