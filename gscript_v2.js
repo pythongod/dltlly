@@ -184,7 +184,7 @@
             });
         }
 
-        return BattleTable.filterCategory(BattleTable.filterLeague(filteredData, activeLeague));
+        return BattleTable.filterFormats(BattleTable.filterCategory(BattleTable.filterLeague(filteredData, activeLeague)));
     }
 
     function applyFilters(globalSearchTerm = '') {
@@ -196,6 +196,8 @@
         updateUIWithAppliedFilters({
             ...columnSearches,
             ...(activeLeague ? { League: activeLeague } : {}),
+            ...(BattleTable.onBeat ? { Format: 'On Beat' } : {}),
+            ...(BattleTable.titleMatch ? { Match: 'Title match' } : {}),
             ...(globalSearchTerm ? { Global: globalSearchTerm } : {})
         });
     }
@@ -324,12 +326,16 @@
             history.replaceState(null, '', location.pathname);
             document.getElementById('content-category').value = 'battle';
             document.getElementById('sort-order').value = 'uploaded';
-        }
-        if (column === 'Channel') {
-            activeLeague = filter;
-        } else {
             activeLeague = '';
-            searchBox.value = filter;
+            searchBox.value = '';
+            BattleTable.onBeat = false;
+            BattleTable.titleMatch = false;
+        } else if (column === 'Channel') {
+            activeLeague = activeLeague === filter ? '' : filter;
+        } else if (filter === 'On Beat') {
+            BattleTable.onBeat = !BattleTable.onBeat;
+        } else if (filter === '🏆') {
+            BattleTable.titleMatch = !BattleTable.titleMatch;
         }
         applyFilters(searchBox.value);
     }

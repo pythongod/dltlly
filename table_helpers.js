@@ -1,22 +1,35 @@
 // Imported CSV values must stay text, including search highlights and URLs.
 const BattleTable = {
+    onBeat: new URLSearchParams(location.search).get('onBeat') === '1',
+    titleMatch: new URLSearchParams(location.search).get('titleMatch') === '1',
+
+    filterFormats(data) {
+        const headers = data[0] || [];
+        return data.filter((row, index) => index === 0 ||
+            (!this.onBeat || /\bon[\s-]*beat\b/i.test(String(row[headers.indexOf('Type')] || ''))) &&
+            (!this.titleMatch || /🏆|\btitle[\s-]*match\b/i.test(String(row[headers.indexOf('Event')] || ''))));
+    },
     restoreControls() {
         const params = new URLSearchParams(location.search);
         const category = document.getElementById('content-category');
-        if (category && ['battle','interview','promo','other','all'].includes(params.get('category'))) category.value = params.get('category');
+        if (category && ['battle','faceoff','interview','promo','other','all'].includes(params.get('category'))) category.value = params.get('category');
         const sort = document.getElementById('sort-order');
         if (sort && ['uploaded','views-desc','views-asc'].includes(params.get('sort'))) sort.value = params.get('sort');
     },
 
     saveState(search, league) {
         const url = new URL(location.href);
-        const values = {search, league, category: document.getElementById('content-category').value, sort: document.getElementById('sort-order').value};
+        const values = {search, league, onBeat: this.onBeat ? '1' : '', titleMatch: this.titleMatch ? '1' : '', category: document.getElementById('content-category').value, sort: document.getElementById('sort-order').value};
         for (const [key, value] of Object.entries(values)) {
             if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
         }
         history.replaceState(null, '', url);
         document.querySelectorAll('a[data-navigation]').forEach(link => {
             link.href = this.navigationURL(link.dataset.navigation);
+        });
+        document.querySelectorAll('[data-filter]').forEach(button => {
+            if (button.dataset.filter === 'On Beat') button.setAttribute('aria-pressed', String(this.onBeat));
+            if (button.dataset.filter === '🏆') button.setAttribute('aria-pressed', String(this.titleMatch));
         });
         document.querySelectorAll('[data-filter-column="Channel"]').forEach(button => {
             button.setAttribute('aria-pressed', String(button.dataset.filter === league));
@@ -60,8 +73,10 @@ const BattleTable = {
 
     category(row, headers) {
         const value = String(row[headers.indexOf('Content category')] || '').trim().toLowerCase();
-        if (['battle', 'interview', 'promo', 'other'].includes(value)) return value;
         const event = String(row[headers.indexOf('Event')] || '');
+        // Old imports called face-offs battles. Correct the displayed category only.
+        if (!['interview', 'promo', 'other', 'faceoff'].includes(value) && /\bface[\s‐‑–-]*off\b/i.test(event)) return 'faceoff';
+        if (['battle', 'faceoff', 'interview', 'promo', 'other'].includes(value)) return value;
         if (/\b(teaser|promo|trailer)\b/i.test(event)) return 'promo';
         if (/\binterview\b/i.test(event) && !/(?:\+|&|\band\b|\bund\b)\s*interview\b/i.test(event)) return 'interview';
         return 'battle';
@@ -76,7 +91,7 @@ const BattleTable = {
         const badge = document.createElement('span');
         badge.className = 'content-badge';
         const category = this.category(row, headers);
-        badge.textContent = category[0].toUpperCase() + category.slice(1);
+        badge.textContent = category === 'faceoff' ? 'Face-off' : category[0].toUpperCase() + category.slice(1);
         target.appendChild(badge);
     },
 

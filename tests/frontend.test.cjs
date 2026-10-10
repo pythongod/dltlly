@@ -326,3 +326,71 @@ for (const [page, script, csv] of [pages[0], pages[2]]) {
         assert.equal(link.getAttribute('onclick'),null);
     });
 }
+
+for (const [page, script, csv] of [pages[0], pages[2]]) {
+    test(`${script}: format composes with search and league, toggles off and survives navigation`, async t => {
+        const fixture = csvFixture(script === 'gscript_v2.js', [
+            {Channel:'DLTLLY', Type:'On Beat', 'Name #2':'Beat'},
+            {Channel:'DLTLLY', 'Name #2':'Acapella'},
+            {Channel:'RAM', Type:'On Beat'},
+            {Channel:'DLTLLY', Type:'On Beat', 'Name #1':'Else'}
+        ]);
+        const app = await load(t,page,script,csv,'',fixture);
+        search(app,'Shizu');
+        app.document.querySelector('[data-filter="DLTLLY"]').click();
+        const beat = app.document.querySelector('[data-filter="On Beat"]');
+        beat.click();
+        assert.equal(app.document.getElementById('searchBox').value,'Shizu');
+        assert.deepEqual(rows(app.document).map(r=>r.cells[1].textContent),['Beat']);
+        assert.equal(beat.getAttribute('aria-pressed'),'true');
+        const target = new URL(app.window.eval("BattleTable.navigationURL('most_viewed.html')"));
+        assert.equal(target.searchParams.get('onBeat'),'1');
+        assert.equal(target.searchParams.get('league'),'DLTLLY');
+        const restored = await load(t,page,script,csv,target.search,fixture);
+        assert.deepEqual(rows(restored.document).map(r=>r.cells[1].textContent),['Beat']);
+        beat.click();
+        assert.equal(rows(app.document).length,2);
+        app.document.querySelector('[data-filter="DLTLLY"]').click();
+        assert.equal(rows(app.document).length,3);
+        beat.click();
+        app.document.querySelector('[data-filter=""]').click();
+        assert.equal(rows(app.document).length,4);
+        assert.equal(beat.getAttribute('aria-pressed'),'false');
+    });
+    test(`${script}: face-offs are discoverable separately and do not mutate manual event text`, async t => {
+        const v2 = script === 'gscript_v2.js';
+        const header = [...rowFixture(v2)[0], 'Content category'];
+        const fixture = [header, ...['FACE-OFF','Face off Berlin','Faceoff','Battle'].map(Event=>[...rowFixture(v2,{Event})[1],'battle'])].map(r=>r.join(',')).join('\n');
+        const app = await load(t,page,script,csv,'',fixture);
+        assert.equal(rows(app.document).length,1);
+        const select = app.document.getElementById('content-category');
+        select.value='faceoff'; select.dispatchEvent(new app.window.Event('change'));
+        assert.deepEqual(rows(app.document).map(r=>r.cells[2].textContent),['FACE-OFF','Face off Berlin','Faceoff']);
+        assert.ok(rows(app.document).every(r=>r.querySelector('.content-badge').textContent==='Face-off'));
+    });
+    test(`${script}: trophy includes title-match spelling variants and composes with format`, async t => {
+        const fixture = csvFixture(script === 'gscript_v2.js', ['TITLEMATCH','Title Match','Title-Match','🏆','Ordinary Battle','Notitlematch'].map(Event=>({Event,Type:'On Beat',Channel:'FOB','Name #1':'Vyrus','Name #2':'Steel'})));
+        const app = await load(t,page,script,csv,'',fixture);
+        search(app,'Vyrus Steel');
+        app.document.querySelector('[data-filter="FOB"]').click();
+        app.document.querySelector('[data-filter="On Beat"]').click();
+        [...app.document.querySelectorAll('[data-filter]')].find(button => button.dataset.filter === '🏆').click();
+        assert.equal(app.document.getElementById('searchBox').value,'Vyrus Steel');
+        assert.deepEqual(rows(app.document).map(r=>r.cells[2].textContent),['TITLEMATCH','Title Match','Title-Match','🏆']);
+        assert.equal(new URL(app.window.location.href).searchParams.get('titleMatch'),'1');
+        assert.equal([...app.document.querySelectorAll('[data-filter]')].find(button => button.dataset.filter === '🏆').getAttribute('aria-pressed'),'true');
+        const restored = await load(t,page,script,csv,new URL(app.window.location.href).search,fixture);
+        assert.equal(rows(restored.document).length,4);
+        [...app.document.querySelectorAll('[data-filter]')].find(button => button.dataset.filter === '🏆').click();
+        assert.equal(rows(app.document).length,6);
+    });
+}
+
+test('statistics: face-offs with stale battle categories do not count toward MC or yearly rankings', async t => {
+    const app = await load(t,'most_viewed.html','most_viewed.js');
+    const data = ['FACE-OFF','Face off','Faceoff','Battle'].map(Event => {
+        const row = rowFixture(false,{Event})[1]; row[10]='battle'; return row;
+    });
+    assert.equal(app.window.computeTopMCs(data)[0].battles,1);
+    assert.equal(app.window.computeYearlyTopBattles(data)[0].battles.length,1);
+});

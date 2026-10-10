@@ -193,3 +193,27 @@ body.dark-mode .copy-btn:hover {
 body.dark-mode .battle-link a {
     color: #77b7ff;
 }
+
+/* Keep each ranking record and its watch action within the phone viewport. */
+@media (max-width: 700px) {
+    .stats-container { width: 100%; padding: 12px; }
+    .stats-section, .year-section { min-width: 0; }
+    .stats-table, .year-section table, .stats-table tbody, .year-section tbody {
+        display: block; width: 100%;
+    }
+    .stats-table thead, .year-section thead {
+        position: absolute; width: 1px; height: 1px;
+        overflow: hidden; clip-path: inset(50%);
+    }
+    .stats-table tbody tr, .year-section tbody tr {
+        display: block; margin: 12px 0; border: 1px solid #aaa; border-radius: 6px; padding: 8px;
+    }
+    .stats-table tbody td, .year-section tbody td {
+        display: grid; grid-template-columns: 85px minmax(0, 1fr); gap: 8px;
+        white-space: normal; overflow-wrap: anywhere; border: 0; padding: 5px;
+    }
+    .stats-table td::before, .year-section td::before {
+        content: attr(data-label); font-size: 12px; font-weight: 600;
+    }
+    .battle-link a { justify-self: start; padding: 8px 0; }
+}

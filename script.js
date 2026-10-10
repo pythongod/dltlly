@@ -75,7 +75,7 @@ function sortDataByViews(data, isAscending) {
 
 // Function to search within the table
 function searchTable(data, searchText) {
-    let filteredData = BattleTable.filterCategory(BattleTable.filterLeague(data, activeLeague)).filter((row, index) => {
+    let filteredData = BattleTable.filterFormats(BattleTable.filterCategory(BattleTable.filterLeague(data, activeLeague))).filter((row, index) => {
         if (index === 0) return true;
         return BattleTable.matches(row, searchText);
     });
@@ -200,12 +200,16 @@ function applyFilter(filter, column) {
         history.replaceState(null, '', location.pathname);
         document.getElementById('content-category').value = 'battle';
         document.getElementById('sort-order').value = 'uploaded';
-    }
-    if (column === 'Channel') {
-        activeLeague = filter;
-    } else {
         activeLeague = '';
-        searchBox.value = filter;
+        searchBox.value = '';
+        BattleTable.onBeat = false;
+        BattleTable.titleMatch = false;
+    } else if (column === 'Channel') {
+        activeLeague = activeLeague === filter ? '' : filter;
+    } else if (filter === 'On Beat') {
+        BattleTable.onBeat = !BattleTable.onBeat;
+    } else if (filter === '🏆') {
+        BattleTable.titleMatch = !BattleTable.titleMatch;
     }
     searchTable(csvData, searchBox.value);
 }
