@@ -76,7 +76,7 @@ function sortDataByViews(data, isAscending) {
 function searchTable(data, searchText) {
     const filteredData = BattleTable.filterLeague(data, activeLeague).filter((row, index) => {
         if (index === 0) return true;
-        return row.some(cell => cell.toLowerCase().includes(searchText.toLowerCase()));
+        return BattleTable.matches(row, searchText, data[0]);
     });
     currentData = filteredData;
     const numResults = filteredData.length - 1;

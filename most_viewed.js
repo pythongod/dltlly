@@ -38,7 +38,7 @@ function computeTopMCs(rows) {
     const totals = new Map();
 
     rows.forEach(row => {
-        if (!isBattle(row)) return;
+        if (!isBattle(row) || BattleTable.compilation(row[8])) return;
         const views = parseInt(row[VIEWS_INDEX], 10);
         if (Number.isNaN(views)) {
             return;
@@ -47,7 +47,7 @@ function computeTopMCs(rows) {
             if (!name) {
                 return;
             }
-            const trimmed = name.trim();
+            const trimmed = BattleTable.canonicalArtist(name);
             if (!trimmed) {
                 return;
             }
@@ -79,10 +79,12 @@ function computeYearlyTopBattles(rows) {
             byYear.set(year, []);
         }
 
+        const compilation = BattleTable.compilation(row[8]);
         byYear.get(year).push({
+            matchup: compilation ? `${compilation.matchups} (compilation)` : null,
             mc1: row[MC1_INDEX],
             mc2: row[MC2_INDEX],
-            event: row[EVENT_INDEX],
+            event: compilation && row[EVENT_INDEX] === compilation.parsedEvent ? compilation.event : row[EVENT_INDEX],
             league: row[LEAGUE_INDEX],
             uploaded: row[UPLOADED_INDEX],
             url: row[URL_INDEX],
@@ -124,7 +126,7 @@ function renderTopMCs(mcs) {
 
 function createBattleRow(battle, rank) {
     const tr = document.createElement('tr');
-    const matchup = `${battle.mc1} vs ${battle.mc2}`;
+    const matchup = battle.matchup || `${battle.mc1} vs ${battle.mc2}`;
     [rank, matchup, battle.event || '', battle.league || '', formatNumber(battle.views)].forEach(value => {
         const td = document.createElement('td');
         td.textContent = value;
@@ -244,7 +246,7 @@ function buildYearlyTableText(year, format) {
     }
     const rows = entry.battles.map((battle, index) => [
         index + 1,
-        `${battle.mc1} vs ${battle.mc2}`,
+        battle.matchup || `${battle.mc1} vs ${battle.mc2}`,
         battle.event || '',
         battle.league || '',
         format === 'reddit' ? formatNumber(battle.views) : battle.views,
