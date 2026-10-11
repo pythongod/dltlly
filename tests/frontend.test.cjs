@@ -394,3 +394,66 @@ test('statistics: face-offs with stale battle categories do not count toward MC 
     assert.equal(app.window.computeTopMCs(data)[0].battles,1);
     assert.equal(app.window.computeYearlyTopBattles(data)[0].battles.length,1);
 });
+
+for (const [page, script, csv] of pages) {
+    const v2 = script === 'gscript_v2.js';
+    test(`${script}: customer search ignores accents and hidden technical substrings`, async t => {
+        const app = await load(t, page, script, csv, '', csvFixture(v2, [
+            { 'Name #1': 'Jäl', Event: 'München' },
+            { 'Name #1': 'Shizu', ID: 'pbJaLLca8ec', URL: 'https://www.youtube.com/watch?v=pbJaLLca8ec', hidden: 'Munchen' }
+        ]));
+        for (const query of ['Jal', 'Jäl', 'Munchen', 'München']) {
+            search(app, query);
+            assert.equal(rows(app.document).length, 1, query);
+            assert.match(rows(app.document)[0].textContent, /Jäl/);
+        }
+        search(app, 'pbJaLL');
+        assert.equal(rows(app.document).length, 0);
+    });
+}
+
+test('statistics: reviewed artist aliases merge without rewriting source names', async t => {
+    const app = await load(t, 'most_viewed.html', 'most_viewed.js', undefined, '', csvFixture(false, [{}]));
+    const data = [
+        rowFixture(false, { 'Name #1': 'SSYNIC', 'Name #2': 'BONG TEGGY', Views: '100' })[1],
+        rowFixture(false, { 'Name #1': 'BMCL TITELMATCH: SSYNIC', 'Name #2': 'BONG TEGGY - REMATCH', Views: '200' })[1],
+        rowFixture(false, { 'Name #1': 'Someone - REMATCH', 'Name #2': 'Other', Views: '5' })[1]
+    ];
+    const before = JSON.stringify(data);
+    const stats = app.window.computeTopMCs(data);
+    for (const name of ['ssynic', 'bong teggy']) {
+        const mc = stats.find(mc => mc.name.toLowerCase() === name);
+        assert.equal(mc.views, 300);
+        assert.equal(mc.battles, 2);
+    }
+    assert.ok(stats.some(mc => mc.name === 'Someone - REMATCH'));
+    assert.equal(JSON.stringify(data), before);
+});
+
+for (const [page, script, csv] of [pages[0], pages[2]]) {
+    test(`${script}: compilation shows matchups separately and preserves a manual event`, async t => {
+        const v2 = script === 'gscript_v2.js';
+        const entry = { 'Name #1': 'LBB', 'Name #2': 'Ssynic', ID: '6_bXVyjHLF4', Event: 'Kato vs Brian Damage' };
+        const app = await load(t, page, script, csv, '', csvFixture(v2, [entry]));
+        search(app, 'Kato Brian Damage');
+        assert.equal(rows(app.document).length, 1);
+        assert.match(rows(app.document)[0].cells[0].textContent, /Includes: LBB vs Ssynic; Kato vs Brian Damage/);
+        assert.equal(rows(app.document)[0].cells[2].textContent, 'MAYhem3');
+        const manual = rowFixture(v2, { ...entry, Event: 'My manual event' });
+        const before = JSON.stringify(manual);
+        app.window.populateTable(manual);
+        assert.equal(rows(app.document)[0].cells[2].textContent, 'My manual event');
+        assert.equal(JSON.stringify(manual), before);
+    });
+}
+
+test('statistics: compilation appears once in yearly lists and is excluded from MC totals', async t => {
+    const app = await load(t, 'most_viewed.html', 'most_viewed.js', undefined, '', csvFixture(false, [{}]));
+    const row = rowFixture(false, { ID: '6_bXVyjHLF4', 'Name #1': 'LBB', 'Name #2': 'Ssynic', Event: 'Kato vs Brian Damage' })[1];
+    assert.equal(app.window.computeTopMCs([row]).length, 0);
+    const battles = app.window.computeYearlyTopBattles([row])[0].battles;
+    assert.equal(battles.length, 1);
+    const tr = app.window.createBattleRow(battles[0], 1);
+    assert.match(tr.cells[1].textContent, /LBB vs Ssynic; Kato vs Brian Damage/);
+    assert.equal(tr.cells[2].textContent, 'MAYhem3');
+});

@@ -28,7 +28,7 @@
                 
                 columnOrder.forEach(cellIndex => {
                     const td = document.createElement('td');
-                    const rawValue = row[cellIndex] == null ? '' : String(row[cellIndex]);
+                    const rawValue = String(BattleTable.displayValue(row, data[0], cellIndex) ?? '');
                     let cellContent = rawValue;
 
                     if (cellIndex === 10) {
@@ -51,6 +51,7 @@
                     tr.appendChild(td);
                 });
 
+                BattleTable.compilationNote(row, data[0], tr.cells[0]);
                 BattleTable.categoryBadge(row, data[0], tr.cells[5]);
                 tableBody.appendChild(tr);
                 BattleTable.labelCells(tr);
@@ -93,7 +94,7 @@
     function searchTable(data, searchText) {
         const filteredData = data.filter((row, index) => {
             if (index === 0) return true;
-            return BattleTable.matches(row, searchText);
+            return BattleTable.matches(row, searchText, data[0]);
         });
         currentData = filteredData;
         const numResults = filteredData.length - 1;
@@ -180,7 +181,7 @@
             const normalizedTerm = globalSearchTerm.toLowerCase();
             filteredData = filteredData.filter((row, index) => {
                 if (index === 0) return true;
-                return BattleTable.matches(row, normalizedTerm);
+                return BattleTable.matches(row, normalizedTerm, csvData[0]);
             });
         }
 

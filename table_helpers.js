@@ -114,9 +114,55 @@ const BattleTable = {
         })];
     },
 
-    matches(row, query) {
-        const terms = String(query).toLowerCase().split(/\s+/).filter(term => term && !/^vs\.?$/.test(term));
-        return terms.every(term => row.some(cell => String(cell ?? '').toLowerCase().includes(term)));
+    // Reviewed aliases only: punctuation and suffixes on other artists remain intact.
+    canonicalArtist(name) {
+        const trimmed = String(name || '').trim();
+        const aliases = {
+            'bmcl titelmatch: ssynic': 'SSYNIC',
+            'bong teggy - rematch': 'BONG TEGGY'
+        };
+        const key = trimmed.toLowerCase();
+        return Object.hasOwn(aliases, key) ? aliases[key] : trimmed;
+    },
+
+    // Verified against the individual video's title; never rewrite the source CSV.
+    compilation(id) {
+        return id === '6_bXVyjHLF4' ? {
+            matchups: 'LBB vs Ssynic; Kato vs Brian Damage',
+            event: 'MAYhem3',
+            parsedEvent: 'Kato vs Brian Damage'
+        } : null;
+    },
+
+    displayValue(row, headers, index) {
+        const video = this.compilation(row[headers.indexOf('ID')]);
+        const value = row[index];
+        return video && headers[index] === 'Event' && value === video.parsedEvent
+            ? video.event : value;
+    },
+
+    compilationNote(row, headers, target) {
+        const video = this.compilation(row[headers.indexOf('ID')]);
+        if (!video) return;
+        const note = document.createElement('small');
+        note.className = 'compilation-note';
+        note.textContent = `Compilation — Includes: ${video.matchups}. One video; excluded from MC totals.`;
+        target.appendChild(note);
+    },
+
+    normalizeSearch(value) {
+        return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    },
+
+    matches(row, query, headers) {
+        const terms = this.normalizeSearch(query).split(/\s+/).filter(term => term && !/^vs\.?$/.test(term));
+        if (!terms.length) return true;
+        const visibleFields = ['Name #1', 'Name #2', 'Event', 'Location', 'Stadt', 'Type', 'Year', 'Channel', 'Uploaded', 'Views', 'Content category'];
+        const values = headers.flatMap((header, index) => visibleFields.includes(header)
+            ? [this.normalizeSearch(this.displayValue(row, headers, index))] : []);
+        const video = this.compilation(row[headers.indexOf('ID')]);
+        if (video) values.push(this.normalizeSearch(video.matchups));
+        return terms.every(term => values.some(value => value.includes(term)));
     },
 
     emptyState(count) {
